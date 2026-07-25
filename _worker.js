@@ -7,7 +7,7 @@ export default {
     async fetch(request, env, ctx) {
         // ۱. لیست سورس‌های استخراج شده از اسپلیتر
         const SOURCES = [
-            "https://raw.githubusercontent.com/shervinofpersia/Config/refs/heads/main/ProxyNg.json",
+            "https://raw.githubusercontent.com/aishervin/v2ray/refs/heads/main/Sub.json",
             "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile.txt",
             "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile-2.txt",
             "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/BLACK_VLESS_RUS_mobile.txt",
@@ -108,7 +108,7 @@ export default {
                 const security = (params.get('security') || '').toLowerCase();
 
                 // شرط فیلتر شما: Vless و یکی از شبکه‌های ws, grpc, http, xhttp یا سکیوریتی tls, reality
-                const allowedNets = ['ws', 'grpc', 'http', 'httpupgrade', 'splithttp', 'xhttp'];
+                const allowedNets = ['ws', 'grpc', 'tcp', 'http', 'xhttp'];
                 const allowedSec = ['tls', 'reality', 'xtls'];
 
                 if (!allowedNets.includes(net) && !allowedSec.includes(security)) {

@@ -40,7 +40,6 @@ export default {
             "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/refs/heads/main/V2Ray-Config-By-EbraSha.txt",
             "https://raw.githubusercontent.com/MohammadBahemmat/V2ray-Collector/refs/heads/main/subscriptions/all.txt",
             "https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/refs/heads/main/sub.txt",
-            "https://raw.githubusercontent.com/Pawdroid/Free-servers/refs/heads/main/sub",
             "https://raw.githubusercontent.com/mfuu/v2ray/refs/heads/main/v2ray.txt",
             "https://raw.githubusercontent.com/ermaozi/get_subscribe/refs/heads/main/subscribe/v2ray.txt",
             "https://raw.githubusercontent.com/pytimusprime/FreeV2ray/refs/heads/main/all_servers.txt",
@@ -62,7 +61,7 @@ export default {
             "https://raw.githubusercontent.com/R3ZARAHIMI/tg-v2ray-configs-every2h/main/Config_no_cf.txt"
         ];
 
-        const REMARK_TAG = "☬SHΞN™  Telegramer.page.dev";
+        const REMARK_TAG = "☬SHΞN™  subshen.pages.dev";
         const MAX_OUTPUT = 3000;
 
         function safeAtobUnicode(str) {
@@ -122,7 +121,7 @@ export default {
                 const security = (params.get('security') || '').toLowerCase();
 
                 const allowedNets = ['ws', 'grpc', 'tcp', 'http', 'xhttp'];
-                const allowedSec = ['tls', 'reality', 'xtls'];
+                const allowedSec = ['tls', 'reality', 'tcp', 'xtls'];
 
                 if (!allowedNets.includes(net) && !allowedSec.includes(security)) {
                     continue; 

@@ -1,4 +1,4 @@
-const HTML_PAGE = `
+const HTML_PAGE = \`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -437,7 +437,7 @@ const HTML_PAGE = `
           uPlane: { value: new THREE.Vector4(0, 0.15, 8.6, 8.6 * word.aspect) },
           uPlaneZ: { value: -5 }
         },
-        vertexShader: `
+        vertexShader: \`
             varying vec3 vN;
             varying vec3 vW;
             void main() {
@@ -446,8 +446,8 @@ const HTML_PAGE = `
               vW = w.xyz;
               gl_Position = projectionMatrix * viewMatrix * w;
             }
-          `,
-        fragmentShader: `
+          \`,
+        fragmentShader: \`
             uniform vec3 uCam;
             uniform sampler2D uTex;
             uniform float uTime;
@@ -495,7 +495,7 @@ const HTML_PAGE = `
 
               gl_FragColor = vec4(col, 0.74 + fres * 0.20);
             }
-          `
+          \`
       });
       const glassMesh = new THREE.Mesh(prismGeo, glassMat);
       glassMesh.renderOrder = 5;
@@ -520,14 +520,14 @@ const HTML_PAGE = `
         depthWrite: false,
         depthTest: false,
         blending: THREE.AdditiveBlending,
-        vertexShader: `
+        vertexShader: \`
             varying vec2 vP;
             void main(){
               vP = position.xy;
               gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
             }
-          `,
-        fragmentShader: `
+          \`,
+        fragmentShader: \`
             varying vec2 vP;
             void main(){
               vec2 g = abs(fract(vP / 2.2) - 0.5);
@@ -541,7 +541,7 @@ const HTML_PAGE = `
                        + vec3(0.10, 0.12, 0.20) * glow;
               gl_FragColor = vec4(col, 1.0);
             }
-          `
+          \`
       });
       const grid = new THREE.Mesh(new THREE.PlaneGeometry(60, 32), gridMat);
       grid.position.set(0, 0.2, -8);
@@ -587,7 +587,7 @@ const HTML_PAGE = `
           uTime: { value: 0 },
           uDpr: { value: DPR }
         },
-        vertexShader: `
+        vertexShader: \`
             attribute float aSeed;
             uniform float uTime;
             uniform float uDpr;
@@ -601,15 +601,15 @@ const HTML_PAGE = `
               vA = 0.5 + 0.5 * sin(uTime * (0.4 + aSeed * 0.7) + aSeed * 20.0);
               gl_Position = projectionMatrix * mv;
             }
-          `,
-        fragmentShader: `
+          \`,
+        fragmentShader: \`
             varying float vA;
             void main(){
               float d = length(gl_PointCoord - 0.5);
               float a = smoothstep(0.5, 0.1, d) * vA * 0.35;
               gl_FragColor = vec4(0.75, 0.80, 0.95, a);
             }
-          `
+          \`
       });
       const dust = new THREE.Points(dustGeo, dustMat);
       dust.frustumCulled = false;
@@ -621,7 +621,7 @@ const HTML_PAGE = `
       // ================================================================
 
       // ---- beam shaders ----------------------------------------------
-      const BEAM_VERT = `
+      const BEAM_VERT = \`
           attribute vec3 aTangent;
           attribute float aSide;
           attribute float aT;
@@ -640,8 +640,8 @@ const HTML_PAGE = `
             mv.xyz += sideDir * aSide * uWidth;
             gl_Position = projectionMatrix * mv;
           }
-        `;
-      const BEAM_FRAG = `
+        \`;
+      const BEAM_FRAG = \`
           uniform vec3 uColor;
           uniform float uOpacity;
           uniform float uTime;
@@ -661,7 +661,7 @@ const HTML_PAGE = `
             float a = prof * tail * rev * shimmer * uOpacity;
             gl_FragColor = vec4(uColor * (0.72 + 0.85 * core), a);
           }
-        `;
+        \`;
 
       function makeBeam(n, hex, { width = .05, opacity = 1, tailFade = 0, order = 6 } = {}) {
         const geo = new THREE.BufferGeometry();
@@ -763,7 +763,7 @@ const HTML_PAGE = `
       const allBeams = [incoming, reflectBeam, residualBeam];
 
       // ---- spectrum sheet --------------------------------------------
-      const SHEET_VERT = `
+      const SHEET_VERT = \`
           attribute float aW;
           attribute float aT;
           attribute float aAlpha;
@@ -778,8 +778,8 @@ const HTML_PAGE = `
             vW = aW; vT = aT; vA = aAlpha; vRev = aRev; vCol = aColor;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           }
-        `;
-      const SHEET_FRAG = `
+        \`;
+      const SHEET_FRAG = \`
           uniform float uTime;
           uniform float uOpacity;
           uniform float uHeadWhite;
@@ -801,7 +801,7 @@ const HTML_PAGE = `
             vec3 col = mix(vCol, vec3(1.0), uHeadWhite * exp(-vT * uHeadK));
             gl_FragColor = vec4(col, edge * along * rev * vA * grain * uOpacity);
           }
-        `;
+        \`;
 
       function makeSheet(cols, rows, { opacity, headWhite, headK, alongBase, alongK, order = 6 }) {
         const count = cols * rows;

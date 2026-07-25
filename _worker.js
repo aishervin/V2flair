@@ -347,7 +347,8 @@ const HTML_PAGE = `
         g.fillStyle = "#ffffff";
         g.textBaseline = "middle";
         const font = (px) =>
-          `700 ${px}px 'Inter','SF Pro Display',-apple-system,'Segoe UI',Roboto,sans-serif`;
+          "700 " + px + "px 'Inter','SF Pro Display',-apple-system,'Segoe UI',Roboto,sans-serif";
+
         const measure = (px, sp) => {
           g.font = font(px);
           let total = -sp;

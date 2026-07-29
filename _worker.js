@@ -1,6 +1,7 @@
 /**
  * Exclusive ☬SHΞN™ made
- * Vless Advanced Filter, Aggregator & Scorer
+ * Vless & Vmess Advanced Filter, Aggregator & Scorer
+ * Updated: now includes full vmess support
  */
 
 export default {
@@ -8,24 +9,23 @@ export default {
         const url = new URL(request.url);
         const accept = request.headers.get('Accept') || '';
         const userAgent = (request.headers.get('User-Agent') || '').toLowerCase();
-        
-        // تشخیص هوشمند: آیا ریکوئست از مرورگر اومده یا کلاینت V2ray؟
-        const isBrowser = accept.includes('text/html') && 
-                          !userAgent.includes('v2ray') && 
+
+        // تشخیص مرورگر
+        const isBrowser = accept.includes('text/html') &&
+                          !userAgent.includes('v2ray') &&
                           !userAgent.includes('sing-box') &&
                           !userAgent.includes('nekobox') &&
                           !userAgent.includes('clash') &&
-                          !userAgent.includes('vless');
+                          !userAgent.includes('vless') &&
+                          !userAgent.includes('vmess');
 
-        // اگر مرورگر بود، کلودفلر رو هدایت می‌کنیم تا فایل index.html که در ریپازیتوری هست رو نشون بده
         if (isBrowser && !url.searchParams.has('sub')) {
             return env.ASSETS.fetch(request);
         }
 
         // ==========================================
-        // شروع لاجیک جمع‌آوری و فیلتر کانفیگ‌ها
+        // منابع کانفیگ
         // ==========================================
-
         const SOURCES = [
             "https://raw.githubusercontent.com/aishervin/v2ray/refs/heads/main/Sub.json",
             "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile.txt",
@@ -61,9 +61,10 @@ export default {
             "https://raw.githubusercontent.com/R3ZARAHIMI/tg-v2ray-configs-every2h/main/Config_no_cf.txt"
         ];
 
-        const REMARK_TAG = "☬SHΞN™  subshen.pages.dev";
-        const MAX_OUTPUT = 3000;
+        const REMARK_TAG = "☬SHΞN™  Ai core worker";
+        const MAX_OUTPUT = 3500;
 
+        // رمزگشایی بیس ۶۴ با پشتیبانی از یونیکد
         function safeAtobUnicode(str) {
             try {
                 let s = str.trim();
@@ -72,17 +73,18 @@ export default {
                 if (pad) s += "=".repeat(4 - pad);
                 return atob(s);
             } catch (e) {
-                return str; 
+                return str;
             }
         }
 
         let combinedData = "";
 
+        // دریافت تمام منابع
         const fetchPromises = SOURCES.map(async (url) => {
             try {
                 const response = await fetch(url, {
                     headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
-                    cf: { cacheTtl: 3600 } 
+                    cf: { cacheTtl: 3600 }
                 });
                 if (response.ok) {
                     const text = await response.text();
@@ -90,9 +92,9 @@ export default {
                 }
             } catch (err) {}
         });
-
         await Promise.all(fetchPromises);
 
+        // رمزگشایی خطوط بیس۶۴ طولانی (اشتراک کامل)
         const lines = combinedData.split(/\r?\n/);
         for (let line of lines) {
             let s = line.trim();
@@ -104,51 +106,92 @@ export default {
             }
         }
 
-        const regex = /(vless):\/\/[^\s"'<>]+/gim;
+        // جستجوی هر دو پروتکل
+        const regex = /(vless|vmess):\/\/[^\s"'<>]+/gim;
         const matches = combinedData.match(regex) || [];
         const uniqueConfigsMap = new Map();
 
-        for (let uri of matches) {
-            try {
-                const lowUri = uri.toLowerCase();
-                const fakeUrlStr = 'http://' + lowUri.slice(8);
-                const fakeUrl = new URL(fakeUrlStr);
-                
-                const port = parseInt(fakeUrl.port) || 443;
-                const params = new URLSearchParams(fakeUrl.search);
-                
-                const net = (params.get('type') || params.get('mode') || 'tcp').toLowerCase();
-                const security = (params.get('security') || '').toLowerCase();
+        for (let rawUri of matches) {
+            let uri = rawUri.trim();
+            const protocol = uri.match(/^(vless|vmess)/i)[0].toLowerCase();
 
+            // ========== تبدیل vmess base64 به فرمت جدید ==========
+            if (protocol === 'vmess') {
+                const rest = uri.slice(8); // بعد از "vmess://"
+                // اگر rest حاوی '@' یا '?' باشد، احتمالاً فرمت جدید است
+                const isNewFormat = rest.includes('@') || rest.includes('?');
+                if (!isNewFormat) {
+                    // احتمالاً base64 – رمزگشایی و ساخت لینک جدید
+                    try {
+                        const jsonStr = safeAtobUnicode(rest);
+                        const json = JSON.parse(jsonStr);
+                        if (!json.add || !json.port || !json.id) continue;
+
+                        const params = new URLSearchParams();
+                        params.set('encryption', 'auto');
+                        if (json.tls === 'tls') params.set('security', 'tls');
+                        if (json.net) params.set('type', json.net);
+                        if (json.host) params.set('host', json.host);
+                        if (json.path) params.set('path', json.path);
+                        if (json.sni) params.set('sni', json.sni);
+
+                        const newUri = `vmess://${json.id}@${json.add}:${json.port}?${params.toString()}`;
+                        // remark را به انتها اضافه می‌کنیم (در انتها توسط کد جایگزین می‌شود)
+                        uri = newUri + '#' + (json.ps ? encodeURIComponent(json.ps) : 'vmess');
+                    } catch (e) {
+                        continue; // رمزگشایی یا JSON نامعتبر
+                    }
+                }
+            }
+
+            // ========== پردازش یکسان برای vless و vmess ==========
+            try {
+                // ساخت یک URL جعلی برای استخراج پارامترها
+                const uriWithoutProtocol = uri.replace(/^[a-z]+:\/\//i, '');
+                const fakeUrlStr = 'http://' + uriWithoutProtocol;
+                const fakeUrl = new URL(fakeUrlStr);
+
+                const hostname = fakeUrl.hostname;
+                const port = parseInt(fakeUrl.port) || (protocol === 'vmess' ? 80 : 443); // پورت پیش‌فرض بر اساس پروتکل
+                const params = new URLSearchParams(fakeUrl.search);
+
+                let net = (params.get('type') || params.get('mode') || 'tcp').toLowerCase();
+                let security = (params.get('security') || '').toLowerCase();
+
+                // فیلتر شبکه و امنیت (با پشتیبانی از vmess بدون TLS)
                 const allowedNets = ['ws', 'grpc', 'tcp', 'http', 'xhttp'];
-                const allowedSec = ['tls', 'reality', 'tcp', 'xtls'];
+                const allowedSec = ['tls', 'reality', 'tcp', 'xtls', 'none'];
+                if (!security) security = 'none'; // vmess بدون TLS را مجاز می‌کنیم
 
                 if (!allowedNets.includes(net) && !allowedSec.includes(security)) {
-                    continue; 
+                    continue;
                 }
 
-                const key = `${fakeUrl.hostname}|${port}|${net}`;
+                // کلید یکتاسازی
+                const key = `${hostname}|${port}|${net}`;
 
+                // امتیازدهی
                 let score = 50;
                 if (security === 'reality') score += 30;
                 else if (security === 'tls' || security === 'xtls') score += 20;
                 
                 if (['grpc', 'xhttp', 'ws'].includes(net)) score += 15;
-                if ([443, 8443, 2053, 2083].includes(port)) score += 15;
+                if ([443, 8443, 2053, 2083, 80, 8080].includes(port)) score += 15;
 
+                // ذخیره بهترین کانفیگ بر اساس کلید
                 const existing = uniqueConfigsMap.get(key);
                 if (!existing || score > existing.score) {
-                    uniqueConfigsMap.set(key, { uri: uri.trim(), score: score });
+                    uniqueConfigsMap.set(key, { uri: uri.split('#')[0], score: score });
                 }
             } catch (e) {}
         }
 
+        // مرتب‌سازی و محدودیت خروجی
         const sortedConfigs = Array.from(uniqueConfigsMap.values())
             .sort((a, b) => b.score - a.score)
             .slice(0, MAX_OUTPUT)
             .map(item => {
-                const baseUri = item.uri.split('#')[0];
-                return baseUri + '#' + encodeURIComponent(REMARK_TAG);
+                return item.uri + '#' + encodeURIComponent(REMARK_TAG);
             });
 
         const finalPayload = sortedConfigs.join('\n');

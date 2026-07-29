@@ -1,7 +1,7 @@
 /**
  * Exclusive ☬SHΞN™ made
- * Vless & Vmess Advanced Filter, Aggregator & Scorer
- * Updated: now includes full vmess support
+ * Vless Advanced Filter, Aggregator & Scorer
+ * Scoring based on real-world tested configs
  */
 
 export default {
@@ -106,77 +106,67 @@ export default {
             }
         }
 
-        // جستجوی هر دو پروتکل
-        const regex = /(vless|vmess):\/\/[^\s"'<>]+/gim;
+        // فقط کانفیگ‌های vless استخراج می‌شوند
+        const regex = /vless:\/\/[^\s"'<>]+/gim;
         const matches = combinedData.match(regex) || [];
         const uniqueConfigsMap = new Map();
 
-        for (let rawUri of matches) {
-            let uri = rawUri.trim();
-            const protocol = uri.match(/^(vless|vmess)/i)[0].toLowerCase();
-
-            // ========== تبدیل vmess base64 به فرمت جدید ==========
-            if (protocol === 'vmess') {
-                const rest = uri.slice(8); // بعد از "vmess://"
-                // اگر rest حاوی '@' یا '?' باشد، احتمالاً فرمت جدید است
-                const isNewFormat = rest.includes('@') || rest.includes('?');
-                if (!isNewFormat) {
-                    // احتمالاً base64 – رمزگشایی و ساخت لینک جدید
-                    try {
-                        const jsonStr = safeAtobUnicode(rest);
-                        const json = JSON.parse(jsonStr);
-                        if (!json.add || !json.port || !json.id) continue;
-
-                        const params = new URLSearchParams();
-                        params.set('encryption', 'auto');
-                        if (json.tls === 'tls') params.set('security', 'tls');
-                        if (json.net) params.set('type', json.net);
-                        if (json.host) params.set('host', json.host);
-                        if (json.path) params.set('path', json.path);
-                        if (json.sni) params.set('sni', json.sni);
-
-                        const newUri = `vmess://${json.id}@${json.add}:${json.port}?${params.toString()}`;
-                        // remark را به انتها اضافه می‌کنیم (در انتها توسط کد جایگزین می‌شود)
-                        uri = newUri + '#' + (json.ps ? encodeURIComponent(json.ps) : 'vmess');
-                    } catch (e) {
-                        continue; // رمزگشایی یا JSON نامعتبر
-                    }
-                }
-            }
-
-            // ========== پردازش یکسان برای vless و vmess ==========
+        for (let uri of matches) {
             try {
-                // ساخت یک URL جعلی برای استخراج پارامترها
-                const uriWithoutProtocol = uri.replace(/^[a-z]+:\/\//i, '');
+                // استخراج پارامترها با یک URL جعلی
+                const uriWithoutProtocol = uri.replace(/^vless:\/\//i, '');
                 const fakeUrlStr = 'http://' + uriWithoutProtocol;
                 const fakeUrl = new URL(fakeUrlStr);
 
                 const hostname = fakeUrl.hostname;
-                const port = parseInt(fakeUrl.port) || (protocol === 'vmess' ? 80 : 443); // پورت پیش‌فرض بر اساس پروتکل
+                const port = parseInt(fakeUrl.port) || 443; // پورت پیش‌فرض ۴۴۳
                 const params = new URLSearchParams(fakeUrl.search);
 
-                let net = (params.get('type') || params.get('mode') || 'tcp').toLowerCase();
+                let net = (params.get('type') || 'tcp').toLowerCase();
                 let security = (params.get('security') || '').toLowerCase();
+                let flow = (params.get('flow') || '').toLowerCase();
 
-                // فیلتر شبکه و امنیت (با پشتیبانی از vmess بدون TLS)
-                const allowedNets = ['ws', 'grpc', 'tcp', 'http', 'xhttp'];
-                const allowedSec = ['tls', 'reality', 'tcp', 'xtls', 'none'];
-                if (!security) security = 'none'; // vmess بدون TLS را مجاز می‌کنیم
+                // فقط شبکه‌های مجاز
+                const allowedNets = ['ws', 'grpc', 'tcp', 'xhttp'];
+                const allowedSec = ['tls', 'reality', 'xtls', 'none', ''];
 
                 if (!allowedNets.includes(net) && !allowedSec.includes(security)) {
                     continue;
                 }
+                if (!security) security = 'none';
 
-                // کلید یکتاسازی
+                // کلید یکتاسازی: host:port:net
                 const key = `${hostname}|${port}|${net}`;
 
-                // امتیازدهی
-                let score = 50;
-                if (security === 'reality') score += 30;
-                else if (security === 'tls' || security === 'xtls') score += 20;
-                
-                if (['grpc', 'xhttp', 'ws'].includes(net)) score += 15;
-                if ([443, 8443, 2053, 2083, 80, 8080].includes(port)) score += 15;
+                // ========= امتیازدهی جدید =========
+                let score = 40; // پایه
+
+                // امنیت
+                if (security === 'reality') {
+                    score += 50;
+                } else if (security === 'tls' || security === 'xtls') {
+                    score += 20;
+                }
+
+                // نوع شبکه
+                if (net === 'grpc') {
+                    score += 25;
+                } else if (net === 'xhttp') {
+                    score += 25;
+                } else if (net === 'ws') {
+                    score += 20;
+                } else if (net === 'tcp') {
+                    // فقط در صورت وجود xtls-rprx-vision
+                    if (flow === 'xtls-rprx-vision') {
+                        score += 25;
+                    }
+                    // tcp بدون vision هیچ امتیاز اضافی نمی‌گیرد
+                }
+
+                // پورت‌های طلایی
+                if ([443, 8443, 2096, 2087, 2053].includes(port)) {
+                    score += 10;
+                }
 
                 // ذخیره بهترین کانفیگ بر اساس کلید
                 const existing = uniqueConfigsMap.get(key);

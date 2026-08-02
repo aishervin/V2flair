@@ -60,7 +60,7 @@ async function generateExpandedConfigs() {
     }
 
     // فقط ۵ گروه اول (در عمل به این تعداد نمی‌رسه، ولی برای احتیاط)
-    const limitedGroups = duplicateGroups.slice(0, 5);
+    const limitedGroups = duplicateGroups.slice(0, 10);
     if (limitedGroups.length === 0) return '# No duplicate groups found.';
 
     let allExpanded = [];
@@ -129,6 +129,7 @@ export default {
         // ---------- جمع‌آوری کانفیگ‌ها از منابع ----------
         const SOURCES = [
             "https://raw.githubusercontent.com/aishervin/v2ray/refs/heads/main/Sub.json",
+            "https://raw.githubusercontent.com/iboxz/free-v2ray-collector/main/main/vless.txt",
             "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile.txt",
             "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile-2.txt",
             "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/BLACK_VLESS_RUS_mobile.txt",
@@ -192,7 +193,7 @@ export default {
         const matches = combinedData.match(regex) || [];
 
         // ---------- امتیازدهی و فیلتر ----------
-        const REMARK_TAG = "☬SHΞN™  Ai core worker";
+        const REMARK_TAG = "☬SHΞN™ t.me/Shervini";
         const MAX_OUTPUT = 3500;
 
         const uniqueConfigsMap = new Map();

@@ -1,132 +1,31 @@
 /**
- * Exclusive ☬SHΞN™
- * Vless Advanced Filter + /24 Expander
- * Routes:
- *   /          → Base64 subscription (original logic)
- *   /extender  → Plain text expanded configs from duplicate groups
+ * Exclusive ☬SHΞN™ made
+ * Vless Advanced Filter, Aggregator & Scorer
  */
 
-// ==================== تابع دریافت کانفیگ از خودمان ====================
-async function fetchOwnConfigs() {
-    const response = await fetch('https://subshen.pages.dev/?sub=1', {
-        headers: { 'User-Agent': 'v2ray' }
-    });
-    if (!response.ok) throw new Error(`Failed to fetch configs: ${response.status}`);
-    const base64Text = await response.text();
-    return atob(base64Text);
-}
-
-// ==================== تابع تولید کانفیگ‌های گسترش‌یافته ====================
-async function generateExpandedConfigs() {
-    const configsText = await fetchOwnConfigs();
-    const matches = configsText.match(/vless:\/\/[^\s"'<>]+/gim) || [];
-
-    function parseVless(uri) {
-        try {
-            const u = new URL(uri);
-            return {
-                uuid: u.username,
-                host: u.hostname,
-                port: parseInt(u.port) || 443,
-                params: new URLSearchParams(u.search)
-            };
-        } catch { return null; }
-    }
-
-    function getGroupKey(parsed) {
-        const { uuid, host, params } = parsed;
-        const p = Object.fromEntries(params.entries());
-        const exclude = ['sid', 'mode', 'alpn', 'insecure', 'allowInsecure'];
-        for (const k of exclude) delete p[k];
-        const sorted = Object.keys(p).sort().reduce((obj, k) => {
-            obj[k] = p[k];
-            return obj;
-        }, {});
-        return JSON.stringify({ uuid, host, ...sorted });
-    }
-
-    const groups = new Map();
-    for (const uri of matches) {
-        const parsed = parseVless(uri);
-        if (!parsed) continue;
-        const key = getGroupKey(parsed);
-        if (!groups.has(key)) groups.set(key, []);
-        groups.get(key).push(parsed);
-    }
-
-    const duplicateGroups = [];
-    for (const [key, items] of groups) {
-        if (items.length >= 2) duplicateGroups.push(items);
-    }
-
-    // فقط ۵ گروه اول (در عمل به این تعداد نمی‌رسه، ولی برای احتیاط)
-    const limitedGroups = duplicateGroups.slice(0, 10);
-    if (limitedGroups.length === 0) return '# No duplicate groups found.';
-
-    let allExpanded = [];
-    for (const group of limitedGroups) {
-        const base = group[0];
-        const parts = base.host.split('.');
-        if (parts.length !== 4) continue;
-        const prefix = parts.slice(0, 3).join('.');
-        for (let i = 0; i <= 255; i++) {
-            const newHost = `${prefix}.${i}`;
-            const params = new URLSearchParams(base.params);
-            const search = params.toString();
-            allExpanded.push(
-                `vless://${base.uuid}@${newHost}:${base.port}${search ? '?'+search : ''}#${encodeURIComponent('☬SH℮N™ /24 '+prefix+'.'+i)}`
-            );
-        }
-    }
-
-    return allExpanded.length ? allExpanded.join('\n') : '# No valid IP ranges found.';
-}
-
-// ==================== هندلر اصلی ====================
 export default {
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
-        const path = url.pathname;
-
-        // ========== مسیر /extender ==========
-        if (path === '/extender') {
-            if (request.method !== 'GET') {
-                return new Response('Method Not Allowed', { status: 405 });
-            }
-            try {
-                const expanded = await generateExpandedConfigs();
-                return new Response(expanded, {
-                    status: 200,
-                    headers: {
-                        'Content-Type': 'text/plain; charset=utf-8',
-                        'Cache-Control': 'no-store, no-cache, must-revalidate'
-                    }
-                });
-            } catch (err) {
-                return new Response('Error: ' + err.message, { status: 500 });
-            }
-        }
-
-        // ========== مسیر اصلی (ساب‌لینک) ==========
         const accept = request.headers.get('Accept') || '';
         const userAgent = (request.headers.get('User-Agent') || '').toLowerCase();
-
-        const isBrowser = accept.includes('text/html') &&
-                          !userAgent.includes('v2ray') &&
+        
+        // تشخیص هوشمند: آیا ریکوئست از مرورگر اومده یا کلاینت V2ray؟
+        const isBrowser = accept.includes('text/html') && 
+                          !userAgent.includes('v2ray') && 
                           !userAgent.includes('sing-box') &&
                           !userAgent.includes('nekobox') &&
                           !userAgent.includes('clash') &&
-                          !userAgent.includes('vless') &&
-                          !userAgent.includes('vmess');
+                          !userAgent.includes('vless');
 
+        // اگر مرورگر بود، کلودفلر رو هدایت می‌کنیم تا فایل index.html که در ریپازیتوری هست رو نشون بده
         if (isBrowser && !url.searchParams.has('sub')) {
-            return new Response('☬SHΞN™ Subnet Detector - Use /extender for expanded configs', {
-                status: 200,
-                headers: { 'Content-Type': 'text/html' }
-            });
+            return env.ASSETS.fetch(request);
         }
 
-        // ---------- جمع‌آوری کانفیگ‌ها از منابع ----------
+        // ==========================================
+        // شروع لاجیک جمع‌آوری و فیلتر کانفیگ‌ها
+        // ==========================================
+
         const SOURCES = [
             "https://raw.githubusercontent.com/aishervin/v2ray/refs/heads/main/Sub.json",
             "https://raw.githubusercontent.com/iboxz/free-v2ray-collector/main/main/vless.txt",
@@ -161,73 +60,87 @@ export default {
             "https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/All_Configs_base64_Sub.txt",
             "https://raw.githubusercontent.com/R3ZARAHIMI/tg-v2ray-configs-every2h/main/Config_jo.txt",
             "https://raw.githubusercontent.com/R3ZARAHIMI/tg-v2ray-configs-every2h/main/Config_no_cf.txt"
+    
         ];
 
-        let combinedData = "";
-        const fetchPromises = SOURCES.map(async (src) => {
+        const REMARK_TAG = "☬SHΞN™  subshen.pages.dev";
+        const MAX_OUTPUT = 3000;
+
+        function safeAtobUnicode(str) {
             try {
-                const resp = await fetch(src, {
-                    headers: { "User-Agent": "Mozilla/5.0" }
+                let s = str.trim();
+                s = s.replace(/-/g, "+").replace(/_/g, "/");
+                const pad = s.length % 4;
+                if (pad) s += "=".repeat(4 - pad);
+                return atob(s);
+            } catch (e) {
+                return str; 
+            }
+        }
+
+        let combinedData = "";
+
+        const fetchPromises = SOURCES.map(async (url) => {
+            try {
+                const response = await fetch(url, {
+                    headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
+                    cf: { cacheTtl: 3600 } 
                 });
-                if (resp.ok) {
-                    const text = await resp.text();
+                if (response.ok) {
+                    const text = await response.text();
                     combinedData += '\n' + text;
                 }
-            } catch (e) {}
+            } catch (err) {}
         });
+
         await Promise.all(fetchPromises);
 
-        // رمزگشایی خطوط بیس۶۴
         const lines = combinedData.split(/\r?\n/);
-        for (const line of lines) {
-            const s = line.trim();
+        for (let line of lines) {
+            let s = line.trim();
             if (s.length > 50 && !s.includes('://') && /^[A-Za-z0-9+/=_-]+$/.test(s)) {
                 try {
-                    const decoded = atob(s.replace(/-/g, '+').replace(/_/g, '/'));
+                    const decoded = safeAtobUnicode(s);
                     if (decoded.includes('://')) combinedData += '\n' + decoded;
                 } catch (e) {}
             }
         }
 
-        const regex = /vless:\/\/[^\s"'<>]+/gim;
+        const regex = /(vless):\/\/[^\s"'<>]+/gim;
         const matches = combinedData.match(regex) || [];
-
-        // ---------- امتیازدهی و فیلتر ----------
-        const REMARK_TAG = "☬SHΞN™ t.me/Shervini";
-        const MAX_OUTPUT = 3500;
-
         const uniqueConfigsMap = new Map();
 
         for (let uri of matches) {
             try {
-                const u = new URL(uri);
-                const host = u.hostname;
-                const port = parseInt(u.port) || 443;
-                const params = new URLSearchParams(u.search);
+                const lowUri = uri.toLowerCase();
+                const fakeUrlStr = 'http://' + lowUri.slice(8);
+                const fakeUrl = new URL(fakeUrlStr);
+                
+                const port = parseInt(fakeUrl.port) || 443;
+                const params = new URLSearchParams(fakeUrl.search);
+                
+                const net = (params.get('type') || params.get('mode') || 'tcp').toLowerCase();
+                const security = (params.get('security') || '').toLowerCase();
 
-                let net = (params.get('type') || 'tcp').toLowerCase();
-                let security = (params.get('security') || '').toLowerCase();
-                let flow = (params.get('flow') || '').toLowerCase();
+                const allowedNets = ['ws', 'grpc', 'tcp', 'http', 'xhttp'];
+                const allowedSec = ['tls', 'reality', 'tcp', 'xtls'];
 
-                const allowedNets = ['ws', 'grpc', 'tcp', 'xhttp'];
-                const allowedSec = ['tls', 'reality', 'xtls', 'none', ''];
+                if (!allowedNets.includes(net) && !allowedSec.includes(security)) {
+                    continue; 
+                }
 
-                if (!allowedNets.includes(net) && !allowedSec.includes(security)) continue;
-                if (!security) security = 'none';
+                const key = `${fakeUrl.hostname}|${port}|${net}`;
 
-                const key = `${host}|${port}|${net}`;
-
-                let score = 40;
-                if (security === 'reality') score += 50;
+                let score = 50;
+                if (security === 'reality') score += 30;
                 else if (security === 'tls' || security === 'xtls') score += 20;
-                if (net === 'grpc' || net === 'xhttp') score += 25;
-                else if (net === 'ws') score += 20;
-                else if (net === 'tcp' && flow === 'xtls-rprx-vision') score += 25;
-                if ([443, 8443, 2096, 2087, 2053].includes(port)) score += 10;
+                
+                if (['grpc', 'xhttp', 'ws'].includes(net)) score += 15;
+                if ([443, 8443, 2053, 2083].includes(port)) score += 15;
 
                 const existing = uniqueConfigsMap.get(key);
                 if (!existing || score > existing.score) {
-                    uniqueConfigsMap.set(key, { uri: uri.split('#')[0], score });
+                    uniqueConfigsMap.set(key, { uri: uri.trim(), score: score });
                 }
             } catch (e) {}
         }
@@ -235,7 +148,10 @@ export default {
         const sortedConfigs = Array.from(uniqueConfigsMap.values())
             .sort((a, b) => b.score - a.score)
             .slice(0, MAX_OUTPUT)
-            .map(item => item.uri + '#' + encodeURIComponent(REMARK_TAG));
+            .map(item => {
+                const baseUri = item.uri.split('#')[0];
+                return baseUri + '#' + encodeURIComponent(REMARK_TAG);
+            });
 
         const finalPayload = sortedConfigs.join('\n');
         const b64Payload = btoa(unescape(encodeURIComponent(finalPayload)));

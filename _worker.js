@@ -63,8 +63,8 @@ export default {
     
         ];
 
-        const REMARK_TAG = "☬SHΞN™  subshen.pages.dev";
-        const MAX_OUTPUT = 3000;
+        const REMARK_TAG = "☬SHΞN™ t.me/shervini";
+        const MAX_OUTPUT = 2000;
 
         function safeAtobUnicode(str) {
             try {
@@ -132,11 +132,11 @@ export default {
                 const key = `${fakeUrl.hostname}|${port}|${net}`;
 
                 let score = 50;
-                if (security === 'reality') score += 30;
-                else if (security === 'tls' || security === 'xtls') score += 20;
+                if (security === 'reality') score += 40;
+                else if (security === 'tls' || security === 'xtls') score += 10;
                 
-                if (['grpc', 'xhttp', 'ws'].includes(net)) score += 15;
-                if ([443, 8443, 2053, 2083].includes(port)) score += 15;
+                if (['grpc', 'xhttp', 'ws'].includes(net)) score += 25;
+                if ([443, 8443, 2053, 2083].includes(port)) score += 5;
 
                 const existing = uniqueConfigsMap.get(key);
                 if (!existing || score > existing.score) {

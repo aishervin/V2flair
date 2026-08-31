@@ -28,6 +28,7 @@ export default {
 
         const SOURCES = [
             "https://raw.githubusercontent.com/aishervin/v2ray/refs/heads/main/Sub.json",
+            "https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/refs/heads/main/all/configs.txt",
             "https://raw.githubusercontent.com/iboxz/free-v2ray-collector/main/main/vless.txt",
             "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile.txt",
             "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile-2.txt",
@@ -58,8 +59,8 @@ export default {
             "https://raw.githubusercontent.com/Farid-Karimi/Config-Collector/main/vless_iran.txt"
         ];
 
-        const REMARK_TAG = "☬SHΞN™  T.me/‌خودت‌میدونی ";
-        const MAX_OUTPUT = 3000;
+        const REMARK_TAG = "®️SHΞN™ᴢᴇʀᴏ  T.me/‌Shervini ";
+        const MAX_OUTPUT = 4000;
 
         function safeAtobUnicode(str) {
             try {
@@ -156,8 +157,8 @@ export default {
             headers: {
                 "Content-Type": "text/plain; charset=utf-8",
                 "Cache-Control": "no-store, no-cache, must-revalidate",
-                "Profile-Update-Interval": "6",
-                "Subscription-Userinfo": "upload=0; download=0; total=10737418240000; expire=0"
+                "Profile-Update-Interval": "1",
+                "Subscription-Userinfo": "upload=829900; download=65886; total=19737418240000; expire=0"
             }
         });
     }

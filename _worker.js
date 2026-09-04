@@ -60,7 +60,7 @@ export default {
         ];
 
         const REMARK_TAG = "®️SHΞN™ᴢᴇʀᴏ  T.me/‌Shervini ";
-        const MAX_OUTPUT = 4000;
+        const MAX_OUTPUT = 1000;
 
         function safeAtobUnicode(str) {
             try {

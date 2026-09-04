@@ -27,6 +27,7 @@ export default {
         // ==========================================
 
         const SOURCES = [
+            "https://raw.githubusercontent.com/aishervin/subfine/refs/heads/main/sub.txt",
             "https://raw.githubusercontent.com/aishervin/v2ray/refs/heads/main/Sub.json",
             "https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/refs/heads/main/all/configs.txt",
             "https://raw.githubusercontent.com/iboxz/free-v2ray-collector/main/main/vless.txt",
@@ -60,7 +61,7 @@ export default {
         ];
 
         const REMARK_TAG = "®️SHΞN™ᴢᴇʀᴏ  T.me/‌Shervini ";
-        const MAX_OUTPUT = 1000;
+        const MAX_OUTPUT = 2000;
 
         function safeAtobUnicode(str) {
             try {

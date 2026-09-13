@@ -4,6 +4,10 @@
  * Includes TCP Tested Priority + GeoIP Flag Emoji via https://api.ip.sb/geoip
  */
 
+// Exclusive ☬SHΞN™ made
+// Multi-Protocol (VLESS, VMess, Hysteria2) Advanced Filter, Aggregator & Scorer
+// Includes TCP Tested Priority + GeoIP Flag Emoji
+
 const REMARK_PREFIX = "®️SHΞN™ᴢᴇʀᴏ";
 const REMARK_SUFFIX = "T.me/Shervini";
 const MAX_OUTPUT = 2000;
@@ -14,12 +18,12 @@ const GEOIP_CACHE = new Map();
 // Tested & Clean configs generated every 30m by tester.py pipeline
 const PRIORITY_TESTED_SOURCE = "https://raw.githubusercontent.com/aishervin/V2flair/main/clean_sub.txt";
 
+// Curated active, high-yield sources (kept <= 25 to respect Cloudflare 50 subrequest limit)
 const SOURCES = [
-    // 1. High-priority tested and sorted source from Python pipeline
+    // 1. High-priority tested source from Python pipeline
     PRIORITY_TESTED_SOURCE,
 
-    // 2. Active & Popular Multi-protocol Sources (VLESS, VMess, Hysteria2)
-    "https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/xray/normal/mix",
+    // 2. Active Multi-protocol Sources (VLESS, VMess, Hysteria2)
     "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria",
     "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hy2",
     "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/vmess",
@@ -27,42 +31,20 @@ const SOURCES = [
     "https://raw.githubusercontent.com/MrPooyaCou/V2root/main/HY2.txt",
     "https://raw.githubusercontent.com/MrPooyaCou/V2root/main/VMess.txt",
     "https://raw.githubusercontent.com/MahanKenway/Freedom-V2Ray/main/subscriptions/hysteria2.txt",
+    "https://raw.githubusercontent.com/MahanKenway/Freedom-V2Ray/main/subscriptions/vless.txt",
+    "https://raw.githubusercontent.com/MahanKenway/Freedom-V2Ray/main/subscriptions/reality.txt",
     "https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/All_Configs_Sub.txt",
     "https://raw.githubusercontent.com/freefq/free/master/v2",
     "https://raw.githubusercontent.com/vpei/Free-Node-Merge/main/node.txt",
     "https://raw.githubusercontent.com/mahsanet/v2ray-configs/main/all_configs.txt",
-
-    // 3. Main & original curated repositories
     "https://raw.githubusercontent.com/aishervin/subfine/refs/heads/main/sub.txt",
     "https://raw.githubusercontent.com/aishervin/v2ray/refs/heads/main/Sub.json",
     "https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/refs/heads/main/all/configs.txt",
     "https://raw.githubusercontent.com/iboxz/free-v2ray-collector/main/main/vless.txt",
-    "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile.txt",
-    "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile-2.txt",
-    "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/BLACK_VLESS_RUS_mobile.txt",
-    "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/WHITE-CIDR-RU-checked.txt",
-    "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/BLACK_VLESS_RUS.txt",
     "https://raw.githubusercontent.com/F0rc3Run/F0rc3Run/refs/heads/main/splitted-by-protocol/vless.txt",
-    "https://raw.githubusercontent.com/barry-far/V2ray-config/refs/heads/main/Sub1.txt",
-    "https://raw.githubusercontent.com/barry-far/V2ray-Config/refs/heads/main/Sub2.txt",
-    "https://raw.githubusercontent.com/barry-far/V2ray-Config/refs/heads/main/Sub3.txt",
     "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/refs/heads/main/V2Ray-Config-By-EbraSha.txt",
     "https://raw.githubusercontent.com/MohammadBahemmat/V2ray-Collector/refs/heads/main/subscriptions/all.txt",
     "https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/refs/heads/main/sub.txt",
-    "https://raw.githubusercontent.com/mfuu/v2ray/refs/heads/main/v2ray.txt",
-    "https://raw.githubusercontent.com/ermaozi/get_subscribe/refs/heads/main/subscribe/v2ray.txt",
-    "https://raw.githubusercontent.com/ThomasJasperthecat/sub/refs/heads/main/sublist1.txt",
-    "https://raw.githubusercontent.com/MahanKenway/Freedom-V2Ray/main/subscriptions/vless.txt",
-    "https://raw.githubusercontent.com/MahanKenway/Freedom-V2Ray/main/subscriptions/reality.txt",
-    "https://raw.githubusercontent.com/MatinGhanbari/v2ray-configs/main/subscriptions/v2ray/all_sub.txt",
-    "https://raw.githubusercontent.com/MatinGhanbari/v2ray-configs/main/subscriptions/v2ray/super-sub.txt",
-    "https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/Sub1.txt",
-    "https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/All_Configs_Sub.txt",
-    "https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/All_Configs_base64_Sub.txt",
-    "https://raw.githubusercontent.com/R3ZARAHIMI/tg-v2ray-configs-every2h/main/Config_jo.txt",
-    "https://raw.githubusercontent.com/R3ZARAHIMI/tg-v2ray-configs-every2h/main/Config_no_cf.txt",
-    "https://raw.githubusercontent.com/SoliSpirit/v2ray-configs/refs/heads/main/Protocols/vless.txt",
-    "https://raw.githubusercontent.com/balochscript/free-vpn-configs/gh-pages/subscription-realdelay.txt",
     "https://raw.githubusercontent.com/Farid-Karimi/Config-Collector/main/vless_iran.txt"
 ];
 
@@ -89,7 +71,7 @@ function extractFlagFromText(text) {
 
 function makeRemark(flag) {
     const f = flag || "🌐";
-    return `${REMARKPREFIX || REMARK_PREFIX}${f}${REMARK_SUFFIX}`;
+    return `${REMARK_PREFIX}${f}${REMARK_SUFFIX}`;
 }
 
 function safeAtobUnicode(str) {
@@ -100,7 +82,9 @@ function safeAtobUnicode(str) {
         return decodeURIComponent(escape(atob(s)));
     } catch (e) {
         try {
-            return atob(str.trim());
+            const binary = atob(str.trim());
+            const bytes = new Uint8Array([...binary].map(c => c.charCodeAt(0)));
+            return new TextDecoder().decode(bytes);
         } catch (e2) {
             return str;
         }
@@ -111,7 +95,16 @@ function safeBtoaUnicode(str) {
     try {
         return btoa(unescape(encodeURIComponent(str)));
     } catch (e) {
-        return btoa(str);
+        try {
+            const bytes = new TextEncoder().encode(str);
+            let binary = "";
+            for (let i = 0; i < bytes.length; i += 8192) {
+                binary += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
+            }
+            return btoa(binary);
+        } catch (e2) {
+            return btoa(str);
+        }
     }
 }
 
@@ -140,30 +133,38 @@ async function lookupGeoIP(host) {
 
 export default {
     async fetch(request, env, ctx) {
-        const url = new URL(request.url);
-        const accept = request.headers.get('Accept') || '';
-        const userAgent = (request.headers.get('User-Agent') || '').toLowerCase();
-        
-        // Browser detection
-        const isBrowser = accept.includes('text/html') && 
-                          !userAgent.includes('v2ray') && 
-                          !userAgent.includes('sing-box') &&
-                          !userAgent.includes('nekobox') &&
-                          !userAgent.includes('clash') &&
-                          !userAgent.includes('vless') &&
-                          !userAgent.includes('vmess') &&
-                          !userAgent.includes('hysteria');
+        try {
+            const url = new URL(request.url);
+            const accept = request.headers.get('Accept') || '';
+            const userAgent = (request.headers.get('User-Agent') || '').toLowerCase();
+            
+            // Browser detection
+            const isClient = userAgent.includes('v2ray') || 
+                              userAgent.includes('sing-box') || 
+                              userAgent.includes('nekobox') || 
+                              userAgent.includes('clash') || 
+                              userAgent.includes('vless') || 
+                              userAgent.includes('vmess') || 
+                              userAgent.includes('hysteria') ||
+                              userAgent.includes('streisand') ||
+                              userAgent.includes('shadowrocket') ||
+                              userAgent.includes('stash') ||
+                              userAgent.includes('loon') ||
+                              userAgent.includes('surge') ||
+                              userAgent.includes('quantumult');
 
-        // Route browser requests without ?sub to frontend
-        if (isBrowser && !url.searchParams.has('sub') && url.pathname === '/') {
-            if (env && env.ASSETS) {
-                return env.ASSETS.fetch(request);
+            const isBrowser = !isClient && accept.includes('text/html');
+
+            // Route browser requests without ?sub to frontend static assets
+            if (isBrowser && !url.searchParams.has('sub')) {
+                if (env && env.ASSETS && typeof env.ASSETS.fetch === 'function') {
+                    return env.ASSETS.fetch(request);
+                }
             }
-        }
 
-        // ==========================================
-        // Collect & Aggregate Configs
-        // ==========================================
+            // ==========================================
+            // Collect & Aggregate Configs
+            // ==========================================
 
         let combinedData = "";
         let priorityConfigs = [];
@@ -297,8 +298,8 @@ export default {
             .sort((a, b) => b.score - a.score)
             .slice(0, MAX_OUTPUT);
 
-        // Resolve flag emojis
-        const topGeoLookups = sortedList.slice(0, 30);
+        // Resolve flag emojis (limit to top 10 to stay well under subrequest limits)
+        const topGeoLookups = sortedList.slice(0, 10);
         await Promise.all(topGeoLookups.map(async (item) => {
             const existingFlag = extractFlagFromText(item.rawRemark);
             if (existingFlag) {
@@ -333,5 +334,11 @@ export default {
                 "Subscription-Userinfo": "upload=829900; download=65886; total=19737418240000; expire=0"
             }
         });
+    } catch (err) {
+        return new Response(safeBtoaUnicode(""), {
+            status: 200,
+            headers: { "Content-Type": "text/plain; charset=utf-8" }
+        });
     }
+}
 };

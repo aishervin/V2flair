@@ -235,9 +235,9 @@ async function handleSubscription(req, res) {
         priorityIndex++;
       }
 
-      if (proto === 'hysteria2' || proto === 'hy2') score += 55;
-      if (security === 'reality') score += 40;
-      else if (security === 'tls' || security === 'xtls') score += 15;
+      if (proto === 'hysteria2' || proto === 'hy2') score += 20;
+      if (security === 'reality') score += 70;
+      else if (security === 'tls' || security === 'xtls') score += 10;
 
       if (['grpc', 'xhttp', 'ws'].includes(net)) score += 20;
       if ([443, 8443, 2053, 2083].includes(port)) score += 5;

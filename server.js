@@ -11,7 +11,7 @@ const PORT = 3000;
 
 const REMARK_PREFIX = "®️SHΞN™ᴢᴇʀᴏ";
 const REMARK_SUFFIX = "T.me/Shervini";
-const MAX_OUTPUT = 2000;
+const MAX_OUTPUT = 2345;
 
 const GEOIP_CACHE = new Map();
 const PRIORITY_TESTED_SOURCE = "https://raw.githubusercontent.com/aishervin/V2flair/main/clean_sub.txt";

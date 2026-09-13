@@ -1,0 +1,6 @@
+{
+  "name": "V2flair",
+  "description": "Multi-protocol (VLESS, VMess, Hysteria2) proxy aggregator, TCP ping tester, and 3D WebGL visualizer",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

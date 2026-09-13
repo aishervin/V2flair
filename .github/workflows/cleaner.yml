@@ -1,0 +1,32 @@
+name: Auto Ping Tester & GeoIP Filter (30 Min)
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test-and-filter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run TCP Ping Tester & GeoIP Classifier
+        run: |
+          python tester.py
+
+      - name: Commit and push clean subscription
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add clean_sub.txt
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update tested clean nodes [skip ci]" && git push)

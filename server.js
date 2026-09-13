@@ -35,6 +35,7 @@ const SOURCES = [
   "https://raw.githubusercontent.com/mahsanet/v2ray-configs/main/all_configs.txt",
 
   // 3. Additional curated active repos
+  "https://github.com/aishervin/V2flair/raw/refs/heads/main/clean_sub.txt",
   "https://raw.githubusercontent.com/aishervin/subfine/refs/heads/main/sub.txt",
   "https://raw.githubusercontent.com/aishervin/v2ray/refs/heads/main/Sub.json",
   "https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/refs/heads/main/all/configs.txt",

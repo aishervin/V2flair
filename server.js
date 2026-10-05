@@ -21,38 +21,7 @@ const SOURCES = [
   PRIORITY_TESTED_SOURCE,
 
   // 2. Active Multi-protocol Sources (VLESS, VMess, Hysteria2)
-  "https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/xray/normal/mix",
-  "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria",
-  "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hy2",
-  "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/vmess",
-  "https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/vless",
-  "https://raw.githubusercontent.com/MrPooyaCou/V2root/main/HY2.txt",
-  "https://raw.githubusercontent.com/MrPooyaCou/V2root/main/VMess.txt",
-  "https://raw.githubusercontent.com/MahanKenway/Freedom-V2Ray/main/subscriptions/hysteria2.txt",
-  "https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/All_Configs_Sub.txt",
-  "https://raw.githubusercontent.com/freefq/free/master/v2",
-  "https://raw.githubusercontent.com/vpei/Free-Node-Merge/main/node.txt",
-  "https://raw.githubusercontent.com/mahsanet/v2ray-configs/main/all_configs.txt",
-
-  // 3. Additional curated active repos
-  "https://github.com/aishervin/V2flair/raw/refs/heads/main/clean_sub.txt",
-  "https://raw.githubusercontent.com/aishervin/subfine/refs/heads/main/sub.txt",
-  "https://raw.githubusercontent.com/aishervin/v2ray/refs/heads/main/Sub.json",
-  "https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/refs/heads/main/all/configs.txt",
-  "https://raw.githubusercontent.com/iboxz/free-v2ray-collector/main/main/vless.txt",
-  "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile.txt",
-  "https://raw.githubusercontent.com/igareck/vpn-configs-for-russia/refs/heads/main/Vless-Reality-White-Lists-Rus-Mobile-2.txt",
-  "https://raw.githubusercontent.com/F0rc3Run/F0rc3Run/refs/heads/main/splitted-by-protocol/vless.txt",
-  "https://raw.githubusercontent.com/barry-far/V2ray-config/refs/heads/main/Sub1.txt",
-  "https://raw.githubusercontent.com/barry-far/V2ray-Config/refs/heads/main/Sub2.txt",
-  "https://raw.githubusercontent.com/ebrasha/free-v2ray-public-list/refs/heads/main/V2Ray-Config-By-EbraSha.txt",
-  "https://raw.githubusercontent.com/MohammadBahemmat/V2ray-Collector/refs/heads/main/subscriptions/all.txt",
-  "https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/refs/heads/main/sub.txt",
-  "https://raw.githubusercontent.com/MahanKenway/Freedom-V2Ray/main/subscriptions/vless.txt",
-  "https://raw.githubusercontent.com/MahanKenway/Freedom-V2Ray/main/subscriptions/reality.txt",
-  "https://raw.githubusercontent.com/MatinGhanbari/v2ray-configs/main/subscriptions/v2ray/all_sub.txt",
-  "https://raw.githubusercontent.com/Epodonios/v2ray-configs/refs/heads/main/All_Configs_Sub.txt",
-  "https://raw.githubusercontent.com/Farid-Karimi/Config-Collector/main/vless_iran.txt"
+  "https://raw.githubusercontent.com/aishervin/xray/refs/heads/main/vless.txt"
 ];
 
 function countryCodeToFlagEmoji(countryCode) {

@@ -21,7 +21,8 @@ const SOURCES = [
   PRIORITY_TESTED_SOURCE,
 
   // 2. Active Multi-protocol Sources (VLESS, VMess, Hysteria2)
-  "https://raw.githubusercontent.com/aishervin/xray/refs/heads/main/vless.txt"
+  "https://raw.githubusercontent.com/aishervin/xray/refs/heads/main/vless.txt",
+  "https://raw.githubusercontent.com/aishervin/xray/refs/heads/main/pure.txt"
 ];
 
 function countryCodeToFlagEmoji(countryCode) {

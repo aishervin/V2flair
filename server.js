@@ -14,7 +14,7 @@ const REMARK_SUFFIX = "T.me/Shervini";
 const MAX_OUTPUT = 2345;
 
 const GEOIP_CACHE = new Map();
-const PRIORITY_TESTED_SOURCE = "https://raw.githubusercontent.com/aishervin/V2flair/main/clean_sub.txt";
+const PRIORITY_TESTED_SOURCE = "";
 
 const SOURCES = [
   // 1. High-priority tested source from Python pipeline

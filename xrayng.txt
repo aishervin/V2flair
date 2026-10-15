@@ -9,3 +9,17 @@ PublicKey = QWo3QEg5kOpowZ7bAnzay2B/qLBNYOYAMgqUGpfu7EA=
 AllowedIPs = 0.0.0.0/0
 Endpoint = 103.174.103.104:38443
 PersistentKeepalive = 25
+
+
+
+[Interface]
+PrivateKey = wpOo26KhTc5E+d6DCmrDqc8OGrGeOrF/dAwmNFzS2Lo=
+Address = 10.157.157.98/30
+DNS = 1.1.1.1
+MTU = 1280
+
+[Peer]
+PublicKey = QWo3QEg5kOpowZ7bAnzay2B/qLBNYOYAMgqUGpfu7EA=
+AllowedIPs = 0.0.0.0/0
+Endpoint = 103.174.103.104:38443
+PersistentKeepalive = 25

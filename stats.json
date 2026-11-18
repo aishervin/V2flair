@@ -1,22 +1,22 @@
 {
   "brand": "®️SHΞN™ᴢᴇʀᴏ",
-  "updated": "2026-11-18T14:12:39Z",
-  "nodes": 41,
+  "updated": "2026-11-18T14:21:48Z",
+  "nodes": 39,
   "countries": 5,
-  "best_latency_ms": 96.91603300001361,
-  "best_speed_mbps": 16.11,
+  "best_latency_ms": 38.73051400000804,
+  "best_speed_mbps": 28.31,
   "min_speed_kbps": 800.0,
   "flags": {
-    "🇺🇸": 19,
+    "🇺🇸": 25,
     "🇸🇪": 1,
     "🇫🇮": 8,
-    "🇩🇪": 4,
-    "🇯🇵": 9
+    "🇩🇪": 3,
+    "🇯🇵": 2
   },
   "sources": 45,
-  "collected": 29001,
-  "unique": 8417,
+  "collected": 29175,
+  "unique": 8410,
   "tcp_alive": 1500,
-  "probed_alive": 83,
-  "build_seconds": 490.5
+  "probed_alive": 114,
+  "build_seconds": 406.7
 }

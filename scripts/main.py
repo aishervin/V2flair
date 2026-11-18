@@ -88,18 +88,20 @@ async def run(args: argparse.Namespace) -> int:
         log.error("no valid vless/hysteria2 configs found")
         return 2
 
-    alive = await tcp_filter(nodes)
-    if not alive:
+    # hysteria2 is QUIC/UDP: the TCP pre-filter would throw it away, so it
+    # goes straight to the real (hysteria) probe.
+    vless = [n for n in nodes if n.kind == "vless"]
+    hy2 = [n for n in nodes if n.kind != "vless"]
+    log.info("candidates: %d vless / %d hysteria2", len(vless), len(hy2))
+
+    vless = await tcp_filter(vless) if vless else []
+    if not vless and not hy2:
         log.error("no node passed the TCP filter")
         return 2
-
-    vless = [n for n in alive if n.kind == "vless"]
-    hy2 = [n for n in alive if n.kind != "vless"]
-    log.info("tcp alive: %d vless / %d hysteria2", len(vless), len(hy2))
+    log.info("tcp alive: %d vless", len(vless))
 
     # Priority sources get a reserved slice of the budget instead of competing
     # with huge generic collectors; hysteria2 is rare and cheap to cover.
-    hy2.sort(key=lambda n: n.tcp_ms)
     hy2 = hy2[: config.HY2_MAX_TEST]
 
     quota = int(args.max_test * config.PRIORITY_TEST_SHARE)
@@ -135,7 +137,7 @@ async def run(args: argparse.Namespace) -> int:
 
     if not args.skip_speed:
         await measure_speeds(
-            sorted(vless_probed, key=lambda n: n.latency_ms)[: args.limit * 3],
+            sorted(vless_probed, key=lambda n: n.latency_ms)[: args.limit * 2],
             deadline=deadline,
         )
         if hy2_probed:

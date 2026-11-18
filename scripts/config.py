@@ -57,7 +57,7 @@ TRACE_TIMEOUT = 5.0
 # owner's own link). They get a reserved share of the real-test budget and a
 # small scoring bonus instead of competing purely on TCP latency.
 PRIORITY_SOURCES = int(os.getenv("PRIORITY_SOURCES", "3"))
-PRIORITY_TEST_SHARE = 0.4      # max share of the test budget reserved for them
+PRIORITY_TEST_SHARE = 0.25      # max share of the test budget reserved for them
 PRIORITY_SCORE_BONUS = 6.0
 
 # --- hysteria2 -------------------------------------------------------------
@@ -69,7 +69,7 @@ HY2_READY_TIMEOUT = 8.0
 XRAY_BATCH_SIZE = 120
 XRAY_READY_TIMEOUT = 10.0
 XRAY_BASE_PORT = 21000
-TIME_BUDGET_SECONDS = int(os.getenv("TIME_BUDGET_SECONDS", "1500"))
+TIME_BUDGET_SECONDS = int(os.getenv("TIME_BUDGET_SECONDS", "1800"))
 
 # --- Safety ----------------------------------------------------------------
 MIN_PUBLISH_NODES = 20

@@ -9,7 +9,6 @@ https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/refs/heads/main/a
 
 # --- big multi-protocol collectors ----------------------------
 https://raw.githubusercontent.com/barry-far/V2ray-Config/main/All_Configs_Sub.txt
-https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/main/all/configs.txt
 https://raw.githubusercontent.com/SoliSpirit/v2ray-configs/main/all_configs.txt
 https://raw.githubusercontent.com/MhdiTaheri/V2rayCollector/main/sub/mix
 https://raw.githubusercontent.com/Farid-Karimi/Config-Collector/main/vless_iran.txt

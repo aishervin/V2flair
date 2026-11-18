@@ -112,7 +112,7 @@ python scripts/main.py --dry-run
 
 ```
 scripts/     پایپ‌لاین (collect/parse/test/rank/output/verify)
-functions/   Pages Functions: مسیر /sub بر اساس User-Agent
+_worker.js   Pages advanced mode: / و /sub بر اساس User-Agent
 tests/       تست‌های واحد
 index.html   صفحه‌ی Pages + مقصد نهایی
 _headers     هدرهای Cloudflare Pages

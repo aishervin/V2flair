@@ -5,6 +5,7 @@
 # ============================================================
 
 # --- big multi-protocol collectors (VLESS is extracted) -----
+https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/refs/heads/main/all/configs.txt
 https://raw.githubusercontent.com/barry-far/V2ray-Config/main/All_Configs_Sub.txt
 https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/main/all/configs.txt
 https://raw.githubusercontent.com/SoliSpirit/v2ray-configs/main/all_configs.txt
@@ -17,6 +18,7 @@ https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt
 https://raw.githubusercontent.com/roosterkid/openproxylist/main/V2RAY_RAW.txt
 
 # --- VLESS-first collectors ---------------------------------
+https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/refs/heads/main/all/configs.txt
 https://raw.githubusercontent.com/V2RayRoot/V2RayConfig/main/Config/vless.txt
 https://raw.githubusercontent.com/iboxz/free-v2ray-collector/main/main/vless.txt
 https://raw.githubusercontent.com/MohammadBahemmat/V2ray-Collector/main/servers/vless_servers.txt

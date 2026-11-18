@@ -1,0 +1,84 @@
+name: 🟢 Update subscription
+
+on:
+  schedule:
+    # hourly; GitHub may delay a few minutes
+    - cron: "0 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/**"
+      - "sources.txt"
+      - "requirements.txt"
+      - ".github/workflows/update.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v2flair-update
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore xray / geoip cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            bin
+            .cache
+          key: v2flair-bin-v25
+
+      - name: Prepare xray + GeoLite2
+        run: bash scripts/setup.sh
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Build subscription
+        run: python scripts/main.py --out .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: subscription
+          path: |
+            sub
+            sub.txt
+            base64.txt
+            stats.json
+          retention-days: 14
+
+      - name: Commit and push (Cloudflare Pages auto-deploys)
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sub sub.txt base64.txt stats.json
+          if git diff --cached --quiet; then
+            echo "subscription unchanged, nothing to commit"
+            exit 0
+          fi
+          NODES=$(python -c "import json;print(json.load(open('stats.json'))['nodes'])")
+          git commit \
+            -m "🟢 subscription · ${NODES} nodes · $(date -u +'%Y-%m-%d %H:%M UTC')" \
+            -m "[skip ci]"
+          git push

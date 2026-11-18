@@ -1,0 +1,24 @@
+/sub
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: no-store, no-cache, must-revalidate
+  Profile-Update-Interval: 1
+  Subscription-Userinfo: upload=0; download=0; total=0; expire=0
+
+/base64.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: no-store, no-cache, must-revalidate
+  Profile-Update-Interval: 1
+
+/sub.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: no-store, no-cache, must-revalidate
+  Profile-Update-Interval: 1
+
+/stats.json
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: no-store
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Access-Control-Allow-Origin: *

@@ -1,0 +1,60 @@
+# ============================================================
+#  V2flair sources — curated VLESS collectors
+#  One URL per line. Lines starting with # are ignored.
+#  Keep this list fresh: a dead source is skipped automatically.
+# ============================================================
+
+# --- big multi-protocol collectors (VLESS is extracted) -----
+https://raw.githubusercontent.com/barry-far/V2ray-Config/main/All_Configs_Sub.txt
+https://raw.githubusercontent.com/0xRadikal/Free-v2ray-Configs/main/all/configs.txt
+https://raw.githubusercontent.com/SoliSpirit/v2ray-configs/main/all_configs.txt
+https://raw.githubusercontent.com/MhdiTaheri/V2rayCollector/main/sub/mix
+https://raw.githubusercontent.com/Farid-Karimi/Config-Collector/main/vless_iran.txt
+https://raw.githubusercontent.com/ALIILAPRO/v2rayNG-Config/main/sub.txt
+https://raw.githubusercontent.com/Pawdroid/Free-servers/main/sub
+https://raw.githubusercontent.com/freefq/free/master/v2
+https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt
+https://raw.githubusercontent.com/roosterkid/openproxylist/main/V2RAY_RAW.txt
+
+# --- VLESS-first collectors ---------------------------------
+https://raw.githubusercontent.com/V2RayRoot/V2RayConfig/main/Config/vless.txt
+https://raw.githubusercontent.com/iboxz/free-v2ray-collector/main/main/vless.txt
+https://raw.githubusercontent.com/MohammadBahemmat/V2ray-Collector/main/servers/vless_servers.txt
+https://raw.githubusercontent.com/MahanKenway/Freedom-V2Ray/main/configs/vless.txt
+https://raw.githubusercontent.com/miladtahanian/Config-Collector/main/mixed_iran.txt
+https://raw.githubusercontent.com/mehrtat/vless-collector/main/vless.txt
+https://raw.githubusercontent.com/hamedcode/port-based-v2ray-configs/main/sub/vless.txt
+https://raw.githubusercontent.com/gfpcom/free-proxy-list/main/sources/vless.txt
+
+# --- user provided (all verified on 2026-11-18) -------------
+https://nodebuf.com/s/KeKtloWBXd3LAyhmzJfl2KJV
+https://nodebuf.com/s/xG6q_gvLJqs7ApbIHeTrlNjX
+https://nodebuf.com/s/Psi-2fSRDsfaQE9abeQIrMPZ
+https://nodebuf.com/s/RVhVZQq1QFTFO0LBFoxWGCym
+https://nodebuf.com/s/stOFd8BAXQOBg1mnlMwq6eBx
+https://nodebuf.com/s/jfcAupTHZDPJEPkC7rYWzBdS
+https://nodebuf.com/s/Vi1xK6oU_FcvdsISOuc5YeUE
+https://nodebuf.com/s/5J3iJ4Vog4Nm4GocwIJ_GCuG
+https://nodebuf.com/s/4-OJHL7j6dOtSsq2ovSNMq5q
+https://nodebuf.com/s/Pdj8l1iz3eqAq5_GIzc8v5zw
+https://nodebuf.com/s/daldw1ZEMvKu7Cizyky3hHGT
+https://nodebuf.com/s/ERP1JrZXqFYsJUOZXFkyrFr6
+https://nodebuf.com/s/rBiyMBoJhYZbeDGxJGdtQDfC
+https://nodebuf.com/s/9BhcIboumw1Hrg-SUxBIf4hv
+https://nodebuf.com/s/ltalyAuV50dimI0aK7w6b8Ml
+https://nodebuf.com/s/zgdbLyJs4Axdr4NkkC5YttjM
+https://nodebuf.com/s/ewDECtWPKoveFWqCB9PxGpXK
+https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/refs/heads/main/Movaghat
+https://raw.githubusercontent.com/Mosifree/-FREE2CONFIG/refs/heads/main/Reality
+https://raw.githubusercontent.com/HIDDIFYplas/-HIDDIFY_plas/refs/heads/main/%40HIDDIFY_plas270
+https://raw.githubusercontent.com/s0ulcoil/HavenVPN/refs/heads/main/Haven
+https://raw.githubusercontent.com/Buffetbarko/Universal-Proxy-Config-Parser-/main/blacklist_vpn.txt
+https://hub.mos.ru/akelladejavu/bunker/-/raw/main/BLWL_MIX.txt
+https://svn.mobiletanaz.com:2053/sub/djMsMzIxNTE1LDE3OTM3MDE3MTA.PrSY5d5kYTPUDykxlEtkzTPNXJblvXjyq3sC7WIQOfw
+https://fr.abbaas.net:1000/qdxvoevgy6w3a07c/SoonTeam
+https://mifa.world/ponder
+https://sub.my-vpn.click/subscriptions/yEdQ2-640D3oCdtTiPE2ow.txt
+
+# Dead on 2026-11-18 (kept for reference):
+# https://sub.emol-security.ir:2087/sub/djMsNzczLDE3OTM5MDkzMjU.Sa3pmWkAjJIOmw8hlV7v8rUGwE9iQJRgIVqb7nZbiWo
+# https://martinmoon423.dpdns.org:2096/9xwn9jiu7yqhsy73/16l7k56ws5raz4ir

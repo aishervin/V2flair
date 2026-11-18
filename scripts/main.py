@@ -24,6 +24,7 @@ from parse import Node, dedupe, parse_many
 from rank import apply_flags, select
 from tcptest import tcp_filter
 from verify import verify
+import hy2_test
 from xray_test import measure_speeds, probe_nodes, resolve_countries
 
 log = logging.getLogger("main")
@@ -84,7 +85,7 @@ async def run(args: argparse.Namespace) -> int:
             log.info("  %4d  %s", count, source)
         return 0
     if not nodes:
-        log.error("no valid VLESS configs found")
+        log.error("no valid vless/hysteria2 configs found")
         return 2
 
     alive = await tcp_filter(nodes)
@@ -92,13 +93,34 @@ async def run(args: argparse.Namespace) -> int:
         log.error("no node passed the TCP filter")
         return 2
 
-    # Sort by TCP handshake and cap the number of nodes we open through Xray.
-    alive.sort(key=lambda n: n.tcp_ms)
-    if len(alive) > args.max_test:
-        log.info("capping real tests to %d node(s) (fastest TCP)", args.max_test)
-        alive = alive[: args.max_test]
+    vless = [n for n in alive if n.kind == "vless"]
+    hy2 = [n for n in alive if n.kind != "vless"]
+    log.info("tcp alive: %d vless / %d hysteria2", len(vless), len(hy2))
 
-    probed = await probe_nodes(alive, deadline=deadline)
+    # Priority sources get a reserved slice of the budget instead of competing
+    # with huge generic collectors; hysteria2 is rare and cheap to cover.
+    hy2.sort(key=lambda n: n.tcp_ms)
+    hy2 = hy2[: config.HY2_MAX_TEST]
+
+    quota = int(args.max_test * config.PRIORITY_TEST_SHARE)
+    priority = sorted(
+        (n for n in vless if n.source_rank < config.PRIORITY_SOURCES),
+        key=lambda n: n.tcp_ms,
+    )[:quota]
+    rest = sorted(
+        (n for n in vless if n.source_rank >= config.PRIORITY_SOURCES),
+        key=lambda n: n.tcp_ms,
+    )
+    budget = max(0, args.max_test - len(hy2) - len(priority))
+    rest = rest[:budget]
+    log.info(
+        "real-test budget: %d priority + %d general + %d hy2",
+        len(priority), len(rest), len(hy2),
+    )
+
+    probed = await hy2_test.probe_nodes(hy2, deadline=deadline) if hy2 else []
+    vless_probed = await probe_nodes(priority + rest, deadline=deadline)
+    probed.extend(vless_probed)
     if not probed:
         log.error("no node passed the real proxy test")
         return 2

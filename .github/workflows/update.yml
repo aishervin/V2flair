@@ -45,9 +45,9 @@ jobs:
           path: |
             bin
             .cache
-          key: v2flair-bin-v25
+          key: v2flair-bin-v26
 
-      - name: Prepare xray + GeoLite2
+      - name: Prepare xray + hysteria + GeoLite2
         run: bash scripts/setup.sh
 
       - name: Unit tests

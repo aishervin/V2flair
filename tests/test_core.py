@@ -97,6 +97,62 @@ class ParseTests(unittest.TestCase):
         self.assertEqual(len(extract_uris(text)), 1)
 
 
+HY2 = (
+    "hysteria2://s3cret%40pw@hy.example.com:443?insecure=1&sni=hy.example.com"
+    "&obfs=salamander&obfs-password=obfspw#%F0%9F%87%AB%F0%9F%87%AE%20FI"
+)
+
+
+class Hysteria2Tests(unittest.TestCase):
+    def test_parse_and_normalise(self) -> None:
+        node = parse_uri(HY2)
+        assert node is not None
+        self.assertEqual(node.kind, "hysteria2")
+        self.assertEqual(node.auth, "s3cret@pw")
+        self.assertEqual(node.port, 443)
+        self.assertTrue(node.allow_insecure)
+        self.assertEqual(node.obfs, "salamander")
+        self.assertEqual(node.obfs_password, "obfspw")
+        self.assertEqual(node.flag, "🇫🇮")
+        self.assertTrue(node.uri.startswith("hysteria2://s3cret%40pw@hy.example.com:443?"))
+        self.assertIn("insecure=1", node.uri)
+        self.assertIn("obfs-password=obfspw", node.uri)
+
+    def test_hy2_alias_and_dedupe_key(self) -> None:
+        a = parse_uri(HY2)
+        b = parse_uri(HY2.replace("hysteria2://", "hy2://", 1))
+        assert a and b
+        self.assertEqual(a.key, b.key)
+        self.assertEqual(len(dedupe([a, b])), 1)
+
+    def test_rejects_bad_hy2(self) -> None:
+        for uri in (
+            "hysteria2://hy.example.com:443",           # no auth
+            "hysteria2://pw@127.0.0.1:443",             # private host
+            "hysteria2://pw@hy.example.com:0",
+        ):
+            with self.subTest(uri=uri):
+                self.assertIsNone(parse_uri(uri))
+
+    def test_hy2_and_vless_are_distinct(self) -> None:
+        v = parse_uri(REALITY)
+        h = parse_uri(HY2)
+        assert v and h
+        self.assertNotEqual(v.identity, h.identity)
+
+    def test_verify_accepts_hy2(self) -> None:
+        node = parse_uri(HY2)
+        assert node is not None
+        node.flag = "🇫🇮"
+        tmp = tempfile.mkdtemp()
+        line = publish_uri(node) + "\n"
+        Path(tmp, "sub.txt").write_text(line, encoding="utf-8")
+        Path(tmp, "sub.b64").write_text(
+            base64.b64encode(line.encode()).decode() + "\n", encoding="ascii"
+        )
+        self.assertEqual(verify(tmp, min_nodes=1), [])
+
+
 class RankTests(unittest.TestCase):
     def test_better_node_wins(self) -> None:
         fast = parse_uri(REALITY)

@@ -1,19 +1,19 @@
 # ☬SHΞN™ V2flair
 
-سابسکریپشن **VLESS** تصفیه‌شده: جمع‌آوری از کالکتورهای گیت‌هاب، حذف تکراری و خراب،
+سابسکریپشن **VLESS + Hysteria2** تصفیه‌شده: جمع‌آوری از کالکتورهای گیت‌هاب، حذف تکراری و خراب،
 تست واقعی اتصال (نه فقط پینگ TCP)، تست سرعت، پرچم واقعی کشور خروجی،
 مرتب‌سازی بر اساس کیفیت و انتشار خودکار — هر ساعت.
 
 ```
 GitHub Actions (hourly)
-   ├─ collect  : ~40 منبع VLESS (گیت‌هاب + ساب‌های کاربر)
+   ├─ collect  : منابع VLESS/Hy2 (اولین منابع = اولویت‌دار)
    ├─ parse    : اعتبارسنجی UUID/هاست/پورت/ترنسپورت، نرمال‌سازی
    ├─ dedupe   : حذف تکراری دقیق و معنایی (UUID+هاست+پورت+ترنسپورت)
    ├─ tcp test : پینگ TCP موازی
-   ├─ xray     : تست واقعی HTTP از داخل پروکسی (204) + پینگ واقعی
+   ├─ proxy    : تست واقعی HTTP از داخل پروکسی (Xray برای VLESS، کلاینت رسمی Hysteria برای Hy2)
    ├─ speed    : دانلود 512KB از Cloudflare و محاسبه Mbit/s
    ├─ geo      : کشور خروجی واقعی از cdn-cgi/trace + fallback آفلاین GeoLite2
-   ├─ rank     : امتیاز ترکیبی سرعت/تاخیر/پایداری + Reality bonus
+   ├─ rank     : امتیاز ترکیبی سرعت/تاخیر/پایداری + Reality/اولویت bonus
    ├─ verify   : عدم تکرار، عدم خرابی، برچسب درست
    └─ commit   : فایل‌های خروجی → برنچ main → Cloudflare Pages auto-deploy
 ```
@@ -34,13 +34,18 @@ GitHub Actions (hourly)
 | مسیر | توضیح |
 |---|---|
 | `/` | دو منظوره: برای کلاینت‌ها ساب base64، برای مرورگر صفحه‌ی نمایشی + ریدایرکت |
-| `/sub` | همان رفتار دو منظوره (Pages Function) |
+| `/sub` | همان رفتار دو منظوره (worker) |
 | `/sub.b64` | base64 خام — v2rayN، v2rayNG، NekoBox، Streisand |
 | `/sub.txt` | متن خام، هر خط یک نود — Hiddify، Happ، sing-box |
 | `/base64.txt` | همان base64 |
 | `/stats.json` | آمار آخرین بیلد |
 
-نودها به ترتیب کیفیت (بهترین اول) مرتب شده‌اند.
+نودها به ترتیب کیفیت (بهترین اول) مرتب شده‌اند. Hysteria2 هم پشتیبانی می‌شود
+(`hysteria2://` و `hy2://`) و با کلاینت رسمی hysteria تست واقعی می‌شود؛ سهم آن در
+خروجی حداکثر ۳۵٪ است.
+
+سه منبع اول `sources.txt` «اولویت‌دار» هستند: سهمی از بودجه‌ی تست برایشان
+رزرو می‌شود (نه صرفاً رقابت روی پینگ TCP) و امتیاز بیشتری می‌گیرند.
 
 ## مقصد نهایی
 
@@ -58,7 +63,7 @@ const FINAL_URL = "https://t.me/aishervin/724";
 git clone https://github.com/aishervin/V2flair
 cd V2flair
 pip install -r requirements.txt
-bash scripts/setup.sh                     # xray + GeoLite2 (فقط برای اجرای محلی)
+bash scripts/setup.sh                     # xray + hysteria + GeoLite2 (فقط برای اجرای محلی)
 python scripts/main.py --out .            # بیلد کامل
 python scripts/verify.py .                # فقط اعتبارسنجی
 python -m unittest discover -s tests -v   # تست‌ها

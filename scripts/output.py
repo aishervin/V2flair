@@ -43,10 +43,12 @@ def write_outputs(
         "brand": BRAND,
         "updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "nodes": len(nodes),
+        "protocols": dict(Counter(n.kind for n in nodes)),
         "countries": len([c for c in countries if c != "\U0001F310"]),
         "best_latency_ms": min((n.latency_ms for n in nodes), default=0),
         "best_speed_mbps": round(max((n.speed_kbps for n in nodes), default=0) / 1000, 2),
         "min_speed_kbps": MIN_SPEED_KBPS,
+        "slowest_speed_kbps": round(min((n.speed_kbps for n in nodes), default=0), 1),
         "flags": dict(countries),
     }
     if extra_stats:

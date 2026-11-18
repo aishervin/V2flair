@@ -39,8 +39,13 @@ def verify(out_dir: str | Path, min_nodes: int = MIN_PUBLISH_NODES) -> list[str]
 
         node = parse_uri(line)
         if node is None:
-            errors.append(f"line {index}: not a valid VLESS uri")
+            errors.append(f"line {index}: not a valid vless/hysteria2 uri")
             continue
+        scheme = line.split("://", 1)[0].lower()
+        if node.kind == "vless" and scheme != "vless":
+            errors.append(f"line {index}: wrong scheme for vless node")
+        if node.kind == "hysteria2" and scheme not in {"hysteria2", "hy2"}:
+            errors.append(f"line {index}: wrong scheme for hysteria2 node")
 
         try:
             parts = urlsplit(line)

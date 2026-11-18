@@ -13,6 +13,9 @@ from config import (
     MIN_SPEED_FLOOR_KBPS,
     MIN_SPEED_KBPS,
     MIN_STABILITY,
+    PRIORITY_SCORE_BONUS,
+    PRIORITY_SOURCES,
+    HY2_MAX_SHARE,
 )
 from geoip import GeoIP
 from parse import Node, extract_flag_from_text, flag_for
@@ -49,6 +52,10 @@ def score_node(node: Node) -> float:
         score += 1.5
     if node.net in {"xhttp", "splithttp"}:
         score += 0.5
+    if node.source_rank < PRIORITY_SOURCES:
+        score += PRIORITY_SCORE_BONUS
+    if node.kind == "hysteria2":
+        score += 2.0
     node.score = round(score, 2)
     return node.score
 
@@ -93,7 +100,22 @@ def select(
 
     candidates.sort(key=lambda n: (-n.score, n.latency_ms, -n.speed_kbps))
     candidates = _dedupe_identity(candidates)
+    candidates = _cap_kind(candidates, limit)
     return candidates[: min(limit, HARD_MAX_NODES)]
+
+
+def _cap_kind(nodes: list[Node], limit: int) -> list[Node]:
+    """Keep at least a majority of plain VLESS nodes in the output."""
+    cap = max(1, int(limit * HY2_MAX_SHARE))
+    kept: list[Node] = []
+    hy2 = 0
+    for node in nodes:
+        if node.kind == "hysteria2":
+            if hy2 >= cap:
+                continue
+            hy2 += 1
+        kept.append(node)
+    return kept
 
 
 def _dedupe_identity(nodes: list[Node]) -> list[Node]:

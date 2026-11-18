@@ -23,6 +23,18 @@ if [ ! -x "$BIN/xray" ]; then
 fi
 "$BIN/xray" version | head -n 1
 
+# hysteria2 client for QUIC nodes (pinned, same reason as xray).
+HYSTERIA_VERSION="${HYSTERIA_VERSION:-v2.6.5}"
+HYSTERIA_ASSET="${HYSTERIA_ASSET:-hysteria-linux-amd64}"
+
+if [ ! -x "$BIN/hysteria" ]; then
+  echo "downloading hysteria ${HYSTERIA_VERSION} (${HYSTERIA_ASSET})..."
+  curl -fsSL --retry 4 --retry-delay 2 -o "$BIN/hysteria" \
+    "https://github.com/apernet/hysteria/releases/download/app/${HYSTERIA_VERSION}/${HYSTERIA_ASSET}"
+  chmod +x "$BIN/hysteria"
+fi
+"$BIN/hysteria" version | head -n 1 || true
+
 if [ ! -s "$CACHE/GeoLite2-Country.mmdb" ]; then
   echo "downloading GeoLite2 country db..."
   curl -fsSL --retry 3 --retry-delay 2 -o "$CACHE/GeoLite2-Country.mmdb" \

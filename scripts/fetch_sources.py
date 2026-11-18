@@ -52,8 +52,8 @@ def _fetch(url: str) -> str:
 
 
 def fetch_all(urls: list[str], workers: int = 16) -> list[tuple[str, str]]:
-    """Return [(source, body)] for every reachable source."""
-    out: list[tuple[str, str]] = []
+    """Return [(source, body)] for every reachable source, in sources.txt order."""
+    bodies: dict[str, str] = {}
     workers = max(1, min(workers, len(urls) or 1))
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futures = {pool.submit(_fetch, url): url for url in urls}
@@ -68,8 +68,9 @@ def fetch_all(urls: list[str], workers: int = 16) -> list[tuple[str, str]]:
                 log.warning("source empty: %s", _short(url))
                 continue
             log.info("source ok: %-60s %8d bytes", _short(url), len(body))
-            out.append((url, body))
-    return out
+            bodies[url] = body
+    # Order matters: the first sources are the priority ones.
+    return [(url, bodies[url]) for url in urls if url in bodies]
 
 
 def _short(url: str) -> str:

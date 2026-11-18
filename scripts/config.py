@@ -11,9 +11,12 @@ BRAND = "\u00ae\ufe0fSH\u039eN\u2122\u1d22\u1d07\u0280\u1d0f"  # ®️SHΞN™�
 # --- What we publish -------------------------------------------------------
 # VLESS only by default (the pipeline targets curated VLESS collector repos).
 ALLOWED_PROTOCOLS = tuple(
-    p.strip().lower()
-    for p in os.getenv("ALLOWED_PROTOCOLS", "vless").split(",")
-    if p.strip()
+    set(
+        p.strip().lower()
+        for p in os.getenv("ALLOWED_PROTOCOLS", "vless,hysteria2").split(",")
+        if p.strip()
+    )
+    | {"hy2"}
 )
 
 # --- Output ----------------------------------------------------------------
@@ -48,6 +51,20 @@ SPEED_CONCURRENCY = 40
 
 TRACE_URL = "https://1.1.1.1/cdn-cgi/trace"
 TRACE_TIMEOUT = 5.0
+
+# --- Source priority --------------------------------------------------------
+# The first N sources in sources.txt are "priority" (best curated feeds, the
+# owner's own link). They get a reserved share of the real-test budget and a
+# small scoring bonus instead of competing purely on TCP latency.
+PRIORITY_SOURCES = int(os.getenv("PRIORITY_SOURCES", "3"))
+PRIORITY_TEST_SHARE = 0.4      # max share of the test budget reserved for them
+PRIORITY_SCORE_BONUS = 6.0
+
+# --- hysteria2 -------------------------------------------------------------
+HY2_BATCH_SIZE = 30
+HY2_MAX_TEST = int(os.getenv("HY2_MAX_TEST", "400"))
+HY2_MAX_SHARE = 0.35           # max share of published nodes
+HY2_READY_TIMEOUT = 8.0
 
 XRAY_BATCH_SIZE = 120
 XRAY_READY_TIMEOUT = 10.0

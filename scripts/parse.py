@@ -62,6 +62,14 @@ class Node:
 
     raw_remark: str = ""
     source: str = ""
+    source_rank: int = 0
+
+    # hysteria2
+    kind: str = "vless"            # vless | hysteria2
+    auth: str = ""
+    obfs: str = ""
+    obfs_password: str = ""
+    pin: str = ""
 
     # test results
     tcp_ms: float = 0.0
@@ -76,7 +84,9 @@ class Node:
 
     @property
     def identity(self) -> str:
-        """One account = one UUID on one endpoint (ignores transport params)."""
+        """One account = one credential on one endpoint (ignores transport params)."""
+        if self.kind == "hysteria2":
+            return f"hy2|{self.auth}|{self.host.lower()}|{self.port}"
         return f"{self.uid}|{self.host.lower()}|{self.port}"
 
     @property
@@ -84,7 +94,11 @@ class Node:
         """Full semantic identity, catches param reordering / duplicate sources."""
         return "|".join(
             (
+                self.kind,
                 self.identity,
+                self.obfs,
+                self.obfs_password,
+                self.pin,
                 self.net,
                 self.security,
                 self.sni.lower(),
@@ -236,8 +250,10 @@ def parse_uri(uri: str, source: str = "") -> Optional[Node]:
     scheme = parts.scheme.lower()
     if scheme not in ALLOWED_PROTOCOLS:
         return None
+    if scheme in {"hysteria2", "hy2"}:
+        return _parse_hysteria2(uri, source)
     if scheme != "vless":
-        return None  # this pipeline publishes VLESS only
+        return None
 
     uid = normalize_uuid(unquote(parts.username or ""))
     if not uid:
@@ -387,6 +403,95 @@ def parse_uri(uri: str, source: str = "") -> Optional[Node]:
     return node
 
 
+def _parse_hysteria2(uri: str, source: str) -> Optional[Node]:
+    """Parse/normalise a hysteria2:// (hy2://) URI.
+
+    Format: hysteria2://[user:pass@]host:port?insecure=1&sni=..&obfs=salamander
+            &obfs-password=..&pinSHA256=..#remark
+    """
+    try:
+        parts = urlsplit(uri)
+    except ValueError:
+        return None
+
+    auth = unquote(parts.username or "")
+    if parts.password:
+        auth = f"{auth}:{unquote(parts.password)}"
+    auth = auth.strip()
+    if not auth:
+        return None
+
+    host = (parts.hostname or "").strip()
+    try:
+        port = parts.port
+    except ValueError:
+        return None
+    if not host or not port or not 1 <= port <= 65535:
+        return None
+    if not is_public_host(host):
+        return None
+
+    params = _clean_params(parts.query)
+
+    sni = (params.get("sni") or params.get("peer") or "").strip()
+    if not sni and not _is_ip(host):
+        sni = host
+
+    allow_insecure = str(params.get("insecure") or params.get("allowinsecure") or "").lower() in {
+        "1", "true", "yes"
+    }
+
+    obfs = (params.get("obfs") or "").lower()
+    if obfs and obfs != "salamander":
+        obfs = ""
+    obfs_password = params.get("obfs-password") or params.get("obfspassword") or ""
+    if obfs and not obfs_password:
+        obfs = ""
+
+    pin = (params.get("pinsha256") or params.get("pin") or "").strip()
+    alpn = (params.get("alpn") or "").strip()
+
+    handled = {
+        "remarks", "remark", "sni", "peer", "insecure", "allowinsecure",
+        "obfs", "obfs-password", "obfspassword", "pinsha256", "pin", "alpn",
+    }
+    out: dict[str, str] = {k: v for k, v in params.items() if k not in handled}
+    if allow_insecure:
+        out["insecure"] = "1"
+    if sni:
+        out["sni"] = sni
+    if obfs:
+        out["obfs"] = obfs
+        out["obfs-password"] = obfs_password
+    if pin:
+        out["pinSHA256"] = pin
+    if alpn:
+        out["alpn"] = alpn
+
+    host_fmt = f"[{host}]" if ":" in host else host
+    query = urlencode(out, quote_via=quote, safe="")
+    node = Node(
+        uri=f"hysteria2://{quote(auth, safe='')}@{host_fmt}:{port}?{query}",
+        uid=auth,
+        auth=auth,
+        kind="hysteria2",
+        host=host.lower(),
+        port=port,
+        security="tls",
+        net="quic",
+        sni=sni,
+        alpn=alpn,
+        obfs=obfs,
+        obfs_password=obfs_password,
+        pin=pin,
+        allow_insecure=allow_insecure,
+        raw_remark=unquote(parts.fragment or ""),
+        source=source,
+    )
+    node.flag = extract_flag_from_text(node.raw_remark)
+    return node
+
+
 def _is_ip(host: str) -> bool:
     try:
         ipaddress.ip_address(host)
@@ -399,13 +504,14 @@ def parse_many(texts: Iterable[tuple[str, str]]) -> tuple[list[Node], dict[str, 
     """Parse (source, text) pairs. Returns nodes + rejection statistics."""
     nodes: list[Node] = []
     stats = {"uris": 0, "accepted": 0, "rejected": 0}
-    for source, text in texts:
+    for rank, (source, text) in enumerate(texts):
         for uri in extract_uris(text):
             stats["uris"] += 1
             node = parse_uri(uri, source)
             if node is None:
                 stats["rejected"] += 1
                 continue
+            node.source_rank = rank
             if not node.flag:
                 node.flag = extract_flag_from_text(node.raw_remark)
             stats["accepted"] += 1

@@ -114,12 +114,13 @@ async def _run_chunk(nodes: list[Node], handler: Handler) -> list:
         return [None] * len(nodes)
 
     procs: list[tuple[subprocess.Popen, Path]] = []
-    ready = []
     try:
         for node, port in zip(nodes, ports):
             proc, path = await _start(node, port)
             procs.append((proc, path))
-            ready.append(await _wait_ready(proc, [port], HY2_READY_TIMEOUT))
+        ready = await asyncio.gather(
+            *(_wait_ready(proc, [port], HY2_READY_TIMEOUT) for (proc, _), port in zip(procs, ports))
+        )
         if not any(ready):
             log.warning("hysteria client never came up (%d node(s))", len(nodes))
             return [None] * len(nodes)

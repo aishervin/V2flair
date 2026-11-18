@@ -105,8 +105,10 @@ async def _stop(proc: subprocess.Popen, cfg: Path) -> None:
         pass
 
 
-async def _run_chunk(nodes: list[Node], handler: Handler) -> list:
-    ports = _pick_ports(len(nodes), start=HY2_PORT)
+async def _run_chunk(nodes: list[Node], handler: Handler, port_base: int) -> list:
+    # Every stage gets its own port range: reusing ports right after the
+    # previous stage leaves them in TIME_WAIT and hysteria cannot bind.
+    ports = _pick_ports(len(nodes), start=port_base)
     try:
         find_hysteria()
     except FileNotFoundError as exc:
@@ -129,12 +131,22 @@ async def _run_chunk(nodes: list[Node], handler: Handler) -> list:
         await asyncio.gather(*(_stop(p, c) for p, c in procs))
 
 
+_port_cursor = HY2_PORT
+
+
+def _port_base() -> int:
+    global _port_cursor
+    _port_cursor += 1000
+    return _port_cursor
+
+
 async def _run_stage(
     nodes: list[Node],
     handler: Handler,
     batch_size: int = HY2_BATCH_SIZE,
     deadline: Optional[float] = None,
 ) -> list:
+    port_base = _port_base()
     results: list = []
     total = len(nodes)
     for offset in range(0, total, batch_size):
@@ -144,7 +156,7 @@ async def _run_stage(
             break
         chunk = nodes[offset : offset + batch_size]
         started = time.perf_counter()
-        results.extend(await _run_chunk(chunk, handler))
+        results.extend(await _run_chunk(chunk, handler, port_base))
         log.info(
             "hy2 tested %d/%d (%.1fs)",
             min(offset + batch_size, total),

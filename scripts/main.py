@@ -42,7 +42,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--sources", default=str(ROOT / "sources.txt"))
     parser.add_argument("--out", default=str(ROOT / "dist"))
     parser.add_argument("--limit", type=int, default=config.DEFAULT_MAX_NODES)
-    parser.add_argument("--max-test", type=int, default=1500, help="max nodes sent to xray")
+    parser.add_argument("--max-test", type=int, default=3000, help="max nodes sent to xray")
     parser.add_argument("--max-latency", type=float, default=config.MAX_LATENCY_MS)
     parser.add_argument("--min-speed", type=float, default=config.MIN_SPEED_KBPS)
     parser.add_argument("--skip-speed", action="store_true")

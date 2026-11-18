@@ -125,12 +125,24 @@ async def run(args: argparse.Namespace) -> int:
         log.error("no node passed the real proxy test")
         return 2
 
+    vless_probed = [n for n in probed if n.kind == "vless"]
+    hy2_probed = [n for n in probed if n.kind != "vless"]
+
     if not args.skip_geo:
-        await resolve_countries(probed, deadline=deadline)
+        await resolve_countries(vless_probed, deadline=deadline)
+        if hy2_probed:
+            await hy2_test.resolve_countries(hy2_probed, deadline=deadline)
 
     if not args.skip_speed:
-        speed_pool = sorted(probed, key=lambda n: n.latency_ms)[: args.limit * 3]
-        await measure_speeds(speed_pool, deadline=deadline)
+        await measure_speeds(
+            sorted(vless_probed, key=lambda n: n.latency_ms)[: args.limit * 3],
+            deadline=deadline,
+        )
+        if hy2_probed:
+            await hy2_test.measure_speeds(
+                sorted(hy2_probed, key=lambda n: n.latency_ms)[: args.limit],
+                deadline=deadline,
+            )
 
     final = select(
         probed,

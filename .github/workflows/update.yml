@@ -72,23 +72,25 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then
-            echo "subscription unchanged, nothing to commit"
-            exit 0
-          fi
           NODES=$(python -c "import json;print(json.load(open('stats.json'))['nodes'])")
-          git commit \
-            -m "🟢 subscription · ${NODES} nodes · $(date -u +'%Y-%m-%d %H:%M UTC')" \
-            -m "[skip ci]"
-          # main may move while we are testing (manual pushes) -> rebase + retry
+          # Generated files are build artefacts: never merge them. Move HEAD to
+          # the current remote tip, keep our fresh files on top, commit, push.
           for attempt in 1 2 3 4 5; do
+            git fetch -q origin main
+            git reset --mixed FETCH_HEAD
+            git add -A
+            if git diff --cached --quiet; then
+              echo "subscription unchanged, nothing to commit"
+              exit 0
+            fi
+            git commit -q \
+              -m "🟢 subscription · ${NODES} nodes · $(date -u +'%Y-%m-%d %H:%M UTC')" \
+              -m "[skip ci]"
             if git push; then
               echo "pushed on attempt ${attempt}"
               exit 0
             fi
-            echo "push rejected (attempt ${attempt}), rebasing onto origin/main"
-            git pull --rebase --autostash origin main || { git rebase --abort || true; }
+            echo "push rejected (attempt ${attempt}), rebuilding commit on new tip"
             sleep $((attempt * 5))
           done
           echo "could not push after 5 attempts" >&2

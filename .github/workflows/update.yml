@@ -81,4 +81,15 @@ jobs:
           git commit \
             -m "🟢 subscription · ${NODES} nodes · $(date -u +'%Y-%m-%d %H:%M UTC')" \
             -m "[skip ci]"
-          git push
+          # main may move while we are testing (manual pushes) -> rebase + retry
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "pushed on attempt ${attempt}"
+              exit 0
+            fi
+            echo "push rejected (attempt ${attempt}), rebasing onto origin/main"
+            git pull --rebase --autostash origin main || { git rebase --abort || true; }
+            sleep $((attempt * 5))
+          done
+          echo "could not push after 5 attempts" >&2
+          exit 1

@@ -61,7 +61,7 @@ def _config(node: Node, port: int) -> dict:
     if node.alpn:
         tls["alpn"] = [p for p in node.alpn.split(",") if p]
     cfg: dict = {
-        "server": f"{node.host}:{node.port}",
+        "server": f"{'[' + node.host + ']' if ':' in node.host else node.host}:{node.port}",
         "auth": node.auth,
         "tls": tls,
         "socks5": {"listen": f"127.0.0.1:{port}"},

@@ -278,9 +278,9 @@ def parse_uri(uri: str, source: str = "") -> Optional[Node]:
     if security in {"tls", "reality"} and not sni:
         return None
 
-    pbk = params.get("pbk") or params.get("publicKey") or ""
-    sid = params.get("sid") or params.get("shortId") or ""
-    spx = params.get("spx") or params.get("spiderX") or "/"
+    pbk = params.get("pbk") or params.get("publickey") or ""
+    sid = params.get("sid") or params.get("shortid") or ""
+    spx = params.get("spx") or params.get("spiderx") or "/"
     if security == "reality" and not pbk:
         return None
 
@@ -288,7 +288,7 @@ def parse_uri(uri: str, source: str = "") -> Optional[Node]:
     if not (net == "tcp" and security in {"tls", "reality"} and flow == "xtls-rprx-vision"):
         flow = ""
 
-    header_type = (params.get("headerType") or "").lower()
+    header_type = (params.get("headertype") or "").lower()
     if header_type not in {"http", "none", ""}:
         header_type = ""
 
@@ -296,7 +296,7 @@ def parse_uri(uri: str, source: str = "") -> Optional[Node]:
     if net in {"ws", "httpupgrade", "xhttp", "splithttp", "h2"} and not path:
         path = "/"
 
-    service_name = params.get("serviceName") or params.get("servicename") or ""
+    service_name = params.get("servicename") or ""
     if net == "grpc" and not service_name:
         service_name = path.lstrip("/")
 
@@ -307,50 +307,52 @@ def parse_uri(uri: str, source: str = "") -> Optional[Node]:
     if security == "reality" and not fp:
         fp = "chrome"
 
-    allow_insecure = str(params.get("allowInsecure") or params.get("insecure") or "").lower() in {
+    allow_insecure = str(params.get("allowinsecure") or params.get("insecure") or "").lower() in {
         "1", "true", "yes"
     }
 
-    # Rebuild a clean query string. Unknown params are preserved on purpose:
-    # if a source needs them we keep them, and we test the same URI we publish.
-    out: dict[str, str] = {
-        k: v for k, v in params.items()
-        if k not in {"remarks", "remark", "network", "peer", "publickey", "shortid", "spiderx"}
+    # Rebuild a clean query string with canonical parameter names. Unknown
+    # params are preserved on purpose: we test and publish the very same URI.
+    handled = {
+        "remarks", "remark", "network", "peer", "publickey", "shortid",
+        "spiderx", "headertype", "servicename", "allowinsecure", "insecure",
+        "host", "path", "mode", "alpn", "fp", "sni", "pbk", "sid", "spx",
+        "flow", "encryption", "security", "type",
     }
+    out: dict[str, str] = {k: v for k, v in params.items() if k not in handled}
     out["encryption"] = "none"
     out["security"] = security
     out["type"] = net
-    if security == "none":
-        for key in ("sni", "fp", "pbk", "sid", "spx", "alpn", "allowInsecure", "insecure"):
-            out.pop(key, None)
-    else:
+    if security != "none":
         out["sni"] = sni
         if fp:
             out["fp"] = fp
-        if security == "reality":
-            out["pbk"] = pbk
-            if sid:
-                out["sid"] = sid
-            if spx:
-                out["spx"] = spx
+        if alpn:
+            out["alpn"] = alpn
+    if security == "reality":
+        out["pbk"] = pbk
+        if sid:
+            out["sid"] = sid
+        if spx:
+            out["spx"] = spx
     if flow:
         out["flow"] = flow
-    else:
-        out.pop("flow", None)
-    if net == "tcp" and header_type:
-        out["headerType"] = header_type
-    if net != "tcp":
-        out.pop("headerType", None)
-    if path and net in {"ws", "httpupgrade", "xhttp", "splithttp", "h2", "grpc"}:
-        out["path"] = path
-    if host_header:
-        out["host"] = host_header
-    if net == "grpc" and service_name:
-        out["serviceName"] = service_name
-    if mode:
-        out["mode"] = mode
-    if alpn and security != "none":
-        out["alpn"] = alpn
+    if net == "tcp" and header_type == "http":
+        out["headerType"] = "http"
+        out["path"] = path or "/"
+        if host_header:
+            out["host"] = host_header
+    elif net in {"ws", "httpupgrade", "xhttp", "splithttp", "h2"}:
+        out["path"] = path or "/"
+        if host_header:
+            out["host"] = host_header
+        if mode:
+            out["mode"] = mode
+    elif net == "grpc":
+        if service_name:
+            out["serviceName"] = service_name
+        if mode:
+            out["mode"] = mode
     if allow_insecure and security == "tls":
         out["allowInsecure"] = "1"
 

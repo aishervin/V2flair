@@ -35,7 +35,7 @@ def write_outputs(
     encoded = base64.b64encode(plain.encode("utf-8")).decode("ascii")
 
     (out / "sub.txt").write_text(plain, encoding="utf-8", newline="\n")
-    (out / "sub").write_text(encoded + "\n", encoding="ascii", newline="\n")
+    (out / "sub.b64").write_text(encoded + "\n", encoding="ascii", newline="\n")
     (out / "base64.txt").write_text(encoded + "\n", encoding="ascii", newline="\n")
 
     countries = Counter(node.flag for node in nodes)

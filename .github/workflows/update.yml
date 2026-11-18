@@ -61,7 +61,7 @@ jobs:
         with:
           name: subscription
           path: |
-            sub
+            sub.b64
             sub.txt
             base64.txt
             stats.json
@@ -72,7 +72,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add sub sub.txt base64.txt stats.json
+          git add -A
           if git diff --cached --quiet; then
             echo "subscription unchanged, nothing to commit"
             exit 0

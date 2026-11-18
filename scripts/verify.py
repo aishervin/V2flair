@@ -56,17 +56,17 @@ def verify(out_dir: str | Path, min_nodes: int = MIN_PUBLISH_NODES) -> list[str]
             errors.append(f"line {index}: duplicate account {node.identity}")
         seen_ids.add(node.identity)
 
-    b64_path = out / "sub"
+    b64_path = out / "sub.b64"
     if not b64_path.is_file():
-        errors.append("sub (base64) is missing")
+        errors.append("sub.b64 (base64) is missing")
     else:
         try:
             decoded = base64.b64decode(b64_path.read_text(encoding="ascii")).decode("utf-8")
         except Exception as exc:  # noqa: BLE001
-            errors.append(f"sub is not valid base64: {exc}")
+            errors.append(f"sub.b64 is not valid base64: {exc}")
         else:
             if decoded != raw:
-                errors.append("sub does not decode to sub.txt")
+                errors.append("sub.b64 does not decode to sub.txt")
 
     if errors:
         for error in errors[:40]:

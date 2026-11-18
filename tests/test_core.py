@@ -114,7 +114,7 @@ class VerifyTests(unittest.TestCase):
     def _write(self, text: str) -> str:
         tmp = tempfile.mkdtemp()
         Path(tmp, "sub.txt").write_text(text, encoding="utf-8")
-        Path(tmp, "sub").write_text(
+        Path(tmp, "sub.b64").write_text(
             base64.b64encode(text.encode()).decode() + "\n", encoding="ascii"
         )
         return tmp

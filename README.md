@@ -33,7 +33,8 @@ GitHub Actions (hourly)
 
 | مسیر | توضیح |
 |---|---|
-| `/sub` | base64 — v2rayN، v2rayNG، NekoBox، Streisand |
+| `/sub` | هوشمند: برای کلاینت‌ها base64، برای مرورگر همان صفحه‌ی نمایشی (Pages Function) |
+| `/sub.b64` | base64 خام — v2rayN، v2rayNG، NekoBox، Streisand |
 | `/sub.txt` | متن خام، هر خط یک نود — Hiddify، Happ، sing-box |
 | `/base64.txt` | همان base64 |
 | `/stats.json` | آمار آخرین بیلد |
@@ -111,6 +112,7 @@ python scripts/main.py --dry-run
 
 ```
 scripts/     پایپ‌لاین (collect/parse/test/rank/output/verify)
+functions/   Pages Functions: مسیر /sub بر اساس User-Agent
 tests/       تست‌های واحد
 index.html   صفحه‌ی Pages + مقصد نهایی
 _headers     هدرهای Cloudflare Pages
